@@ -4,7 +4,7 @@ specifiers:
   '@snickbit/ansi': latest
   '@snickbit/cycle': ^1.0.0
   '@snickbit/utilities': ^3.2.0
-  '@types/jest': 28.1.7
+  '@types/jest': 28.1.8
   '@types/node': 18.6.4
   ansi-styles-template: ^1.0.0
   browser-or-node: ^2.0.0
@@ -29,7 +29,7 @@ dependencies:
   picomatch-browser: 2.2.6
 
 devDependencies:
-  '@types/jest': 28.1.7
+  '@types/jest': 28.1.8
   '@types/node': 18.6.4
   jest: 28.1.3_@types+node@18.6.4
   shx: 0.3.4
@@ -776,8 +776,8 @@ packages:
       '@types/istanbul-lib-report': 3.0.0
     dev: true
 
-  /@types/jest/28.1.7:
-    resolution: {integrity: sha512-acDN4VHD40V24tgu0iC44jchXavRNVFXQ/E6Z5XNsswgoSO/4NgsXoEYmPUGookKldlZQyIpmrEXsHI9cA3ZTA==}
+  /@types/jest/28.1.8:
+    resolution: {integrity: sha512-8TJkV++s7B6XqnDrzR1m/TT0A0h948Pnl/097veySPN67VRAgQ4gZ7n2KfJo2rVq6njQjdxU3GCCyDvAeuHoiw==}
     dependencies:
       expect: 28.1.3
       pretty-format: 28.1.3
