@@ -15,16 +15,17 @@
 		"dist"
 	],
 	"scripts": {
-		"build": "tsup",
+		"build": "tsup --minify --dts",
+		"build:types": "tsc --emitDeclarationOnly --declarationDir dist",
 		"clean": "shx rm -rf ./dist",
-		"depcheck": "depcheck",
-		"dev": "pnpm run build --sourcemap",
+		"dev": "tsup",
+		"dev:types": "tsc --emitDeclarationOnly --declarationMap --declarationDir .types",
 		"docs": "typedoc",
-		"meta": "pnpm run prod --metafile",
-		"prod": "pnpm run build --minify",
 		"start": "node ./examples/node.js",
 		"test": "jest",
-		"watch": "pnpm run dev --watch"
+		"watch": "concurrently -k -c magenta,cyan pnpm:watch:*",
+		"watch:dev": "pnpm run dev --watch",
+		"watch:types": "pnpm run dev:types --watch"
 	},
 	"jest": {
 		"preset": "ts-jest",
@@ -42,6 +43,7 @@
 	"devDependencies": {
 		"@types/jest": "28.1.8",
 		"@types/node": "18.6.4",
+		"concurrently": "7.3.0",
 		"jest": "28.1.3",
 		"shx": "0.3.4",
 		"ts-jest": "28.0.8",
@@ -59,7 +61,6 @@
 			"src/index.ts"
 		],
 		"clean": true,
-		"dts": true,
 		"format": [
 			"esm",
 			"cjs"
