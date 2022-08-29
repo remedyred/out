@@ -44,4 +44,4 @@ describe('Out', () => {
 	it('should have a method isLocked()', () => expect(typeof instance.isLocked).toBe('function'))
 })
 
-describe('Example', () => it('out.example() should not throw', () => expect(() => (new Out()).example()).not.toThrow()))
+describe('Example', () => it('out.example() should not throw', () => expect(() => new Out().example()).not.toThrow()))

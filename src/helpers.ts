@@ -21,8 +21,7 @@ export const terminalWidth = () => (isNode && process.stdout.isTTY ? process.std
  * @internal
  */
 /* eslint @typescript-eslint/no-empty-function: off */
-export const noop = () => {
-}
+export const noop = () => {}
 
 /** @internal */
 export function example() {

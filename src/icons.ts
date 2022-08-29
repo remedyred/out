@@ -2,15 +2,15 @@ import {isBrowser, isNode} from 'browser-or-node'
 
 const icons: Record<string, any> = {
 	log: {
-		unicode: '>\ufe0f',
+		unicode: '>\uFE0F',
 		text: 'log'
 	},
 	info: {
-		unicode: 'i\ufe0f',
+		unicode: 'i\uFE0F',
 		text: 'info'
 	},
 	success: {
-		unicode: '✓\ufe0f',
+		unicode: '✓\uFE0F',
 		text: 'success'
 	},
 	done: {
@@ -18,7 +18,7 @@ const icons: Record<string, any> = {
 		text: 'done'
 	},
 	warn: {
-		unicode: '\u26A0\ufe0f',
+		unicode: '\u26A0\uFE0F',
 		text: 'warn'
 	},
 	fatal: {
@@ -50,7 +50,7 @@ const icons: Record<string, any> = {
 		text: 'silly'
 	},
 	notice: {
-		unicode: '‼\ufe0f',
+		unicode: '‼\uFE0F',
 		text: 'notice'
 	}
 }

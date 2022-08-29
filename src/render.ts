@@ -45,7 +45,7 @@ export function formatCase(text, case_type) {
  * @param {object} [options]
  */
 export function _inspect(value, options = {}) {
-	return isBrowser ? value : inspect(value, {...default_inspection_options, ...options || {}})
+	return isBrowser ? value : inspect(value, {...default_inspection_options, ...options})
 }
 
 /**
