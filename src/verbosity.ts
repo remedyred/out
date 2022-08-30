@@ -19,17 +19,6 @@ const ENV_REGEX = /(?<flag>verbose|verbosity|out)/
 const APP_REGEX = /(:(?<app>[^:=]+))/
 const LEVEL_REGEX = /(=(?<level>\d+))/
 
-interface MatchedArgs {
-	[key: number]: string
-	groups: {
-		flag?: string
-		app?: string
-		level?: string
-	}
-	index: number
-	input: string
-}
-
 export function getEnvVerbosity(env: Record<string, string> | string[]) {
 	if (env) {
 		const is_object = !Array.isArray(env)

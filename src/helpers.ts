@@ -1,6 +1,7 @@
 import {isNode} from 'browser-or-node'
 import {defaultWidth, styles} from './config'
 import {out} from './index'
+import {ansiStyles} from '@snickbit/ansi'
 
 /** @internal */
 export const lineWidth = (min?: number, max?: number): number => {
@@ -37,7 +38,15 @@ export function example() {
 
 	out.ln('Here are all of the styles you can use:')
 	for (const [name, style] of Object.entries(styles)) {
-		const styleVerbosity = style.verbosity > 0 ? style.verbosity : style.verbosity < 0 ? 'forced' : 0
+		let styleVerbosity: number | 'forced'
+		if (style.verbosity > 0) {
+			styleVerbosity = style.verbosity
+		} else if (style.verbosity < 0) {
+			styleVerbosity = 'forced'
+		} else {
+			styleVerbosity = 0
+		}
+
 		out.force.noExit[name](`out.${name}(verbosity: ${styleVerbosity})`)
 	}
 
@@ -86,4 +95,8 @@ export function example() {
 	out.config('textColor', false)
 
 	out.ln('')
+}
+
+export function wrapColor(hex: string, text: string) {
+	return ansiStyles.color.ansi256(ansiStyles.hexToAnsi256(hex)) + text + ansiStyles.color.close
 }

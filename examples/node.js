@@ -1,5 +1,3 @@
-/* eslint-disable */
-
 const {out} = require('../dist')
 const {styles} = require('../src/config')
 
@@ -14,7 +12,7 @@ out.write('out.write()', 'with', 'multiple', 'arguments')
 out.write('out.write()', 'with different', {message: 'Variable', value: 'types'})
 
 out.ln('Here are all of the styles you can use:')
-for (let [name, style] of Object.entries(styles)) {
+for (const [name, style] of Object.entries(styles)) {
 	const styleVerbosity = style.verbosity > 0 ? style.verbosity : style.verbosity < 0 ? 'forced' : 0
 	out.force.noExit[name](`out.${name}(verbosity: ${styleVerbosity})`)
 }
