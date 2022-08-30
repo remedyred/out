@@ -26,10 +26,16 @@ Cross-platform pretty output for your terminal or browser console.
 
 ## Table of contents
 
+### Constructors
+
+- [constructor](Out.md#constructor)
+
 ### Properties
 
+- [arguments](Out.md#arguments)
 - [block](Out.md#block)
 - [broken](Out.md#broken)
+- [caller](Out.md#caller)
 - [center](Out.md#center)
 - [debug](Out.md#debug)
 - [done](Out.md#done)
@@ -39,10 +45,13 @@ Cross-platform pretty output for your terminal or browser console.
 - [fatal](Out.md#fatal)
 - [force](Out.md#force)
 - [info](Out.md#info)
+- [length](Out.md#length)
 - [ln](Out.md#ln)
 - [log](Out.md#log)
+- [name](Out.md#name)
 - [noExit](Out.md#noexit)
 - [notice](Out.md#notice)
+- [prototype](Out.md#prototype)
 - [silly](Out.md#silly)
 - [success](Out.md#success)
 - [throw](Out.md#throw)
@@ -53,10 +62,12 @@ Cross-platform pretty output for your terminal or browser console.
 
 ### Methods
 
+- [[hasInstance]](Out.md#[hasinstance])
 - [\_](Out.md#_)
 - [after](Out.md#after)
 - [apply](Out.md#apply)
 - [before](Out.md#before)
+- [bind](Out.md#bind)
 - [call](Out.md#call)
 - [case](Out.md#case)
 - [clear](Out.md#clear)
@@ -76,11 +87,82 @@ Cross-platform pretty output for your terminal or browser console.
 - [prefix](Out.md#prefix)
 - [rule](Out.md#rule)
 - [setVerbosity](Out.md#setverbosity)
+- [toString](Out.md#tostring)
 - [v](Out.md#v)
 - [verbosity](Out.md#verbosity)
 - [write](Out.md#write)
 
+## Constructors
+
+### constructor
+
+• **new Out**()
+
+#### Inherited from
+
+Function.constructor
+
+• **new Out**(`options`)
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `options` | `Partial`<[`OutSettings`](../README.md#outsettings)\> |
+
+#### Inherited from
+
+Function.constructor
+
+• **new Out**(`name`)
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `name` | `string` |
+
+#### Inherited from
+
+Function.constructor
+
+• **new Out**(`name`, `options`)
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `name` | `string` |
+| `options` | `Partial`<[`OutSettings`](../README.md#outsettings)\> |
+
+#### Inherited from
+
+Function.constructor
+
+• **new Out**(`name?`, `options?`)
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `name?` | `string` \| `Partial`<[`OutSettings`](../README.md#outsettings)\> |
+| `options?` | `Partial`<[`OutSettings`](../README.md#outsettings)\> |
+
+#### Inherited from
+
+Function.constructor
+
 ## Properties
+
+### arguments
+
+• **arguments**: `any`
+
+#### Inherited from
+
+Function.arguments
+
+___
 
 ### block
 
@@ -95,6 +177,16 @@ ___
 • **broken**: [`Out`](Out.md)
 
 Break the output into multiple lines
+
+___
+
+### caller
+
+• **caller**: `Function`
+
+#### Inherited from
+
+Function.caller
 
 ___
 
@@ -170,6 +262,16 @@ Info level output
 
 ___
 
+### length
+
+• `Readonly` **length**: `number`
+
+#### Inherited from
+
+Function.length
+
+___
+
 ### ln
 
 • **ln**: [`Out`](Out.md)
@@ -186,6 +288,18 @@ Log level output
 
 ___
 
+### name
+
+• `Readonly` **name**: `string`
+
+Returns the name of the function. Function names are read-only and can not be changed.
+
+#### Inherited from
+
+Function.name
+
+___
+
 ### noExit
 
 • **noExit**: [`Out`](Out.md)
@@ -199,6 +313,16 @@ ___
 • **notice**: [`Out`](Out.md)
 
 Notice level output
+
+___
+
+### prototype
+
+• **prototype**: `any`
+
+#### Inherited from
+
+Function.prototype
 
 ___
 
@@ -257,6 +381,32 @@ ___
 Warn level output
 
 ## Methods
+
+### [hasInstance]
+
+▸ **[hasInstance]**(`value`): `boolean`
+
+Determines whether the given value inherits from this function if this function was used
+as a constructor function.
+
+A constructor function can control which objects are recognized as its instances by
+'instanceof' by overriding this method.
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `value` | `any` |
+
+#### Returns
+
+`boolean`
+
+#### Inherited from
+
+Function.\_\_@hasInstance@57
+
+___
 
 ### \_
 
@@ -345,6 +495,31 @@ Add a callback to be called before rendering the output
 
 ___
 
+### bind
+
+▸ **bind**(`this`, `thisArg`, ...`argArray`): `any`
+
+For a given function, creates a bound function that has the same body as the original function.
+The this object of the bound function is associated with the specified object, and has the specified initial parameters.
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `this` | `Function` | - |
+| `thisArg` | `any` | An object to which the this keyword can refer inside the new function. |
+| `...argArray` | `any`[] | A list of arguments to be passed to the new function. |
+
+#### Returns
+
+`any`
+
+#### Inherited from
+
+Function.bind
+
+___
+
 ### call
 
 ▸ **call**(...`messages`): [`Out`](Out.md)
@@ -375,7 +550,7 @@ Set the case of the messages, applies to all string values given to the final me
 
 | Name | Type |
 | :------ | :------ |
-| `type` | `CaseType` |
+| `type` | [`CaseType`](../README.md#casetype) |
 
 #### Returns
 
@@ -409,7 +584,7 @@ ___
 
 | Name | Type |
 | :------ | :------ |
-| `options` | `Partial`<`OutSettings`\> |
+| `options` | `Partial`<[`OutSettings`](../README.md#outsettings)\> |
 
 #### Returns
 
@@ -434,7 +609,7 @@ ___
 | Name | Type |
 | :------ | :------ |
 | `name` | `string` |
-| `options` | `Partial`<`OutSettings`\> |
+| `options` | `Partial`<[`OutSettings`](../README.md#outsettings)\> |
 
 #### Returns
 
@@ -446,8 +621,8 @@ ___
 
 | Name | Type |
 | :------ | :------ |
-| `name?` | `string` \| `Partial`<`OutSettings`\> |
-| `options?` | `Partial`<`OutSettings`\> |
+| `name?` | `string` \| `Partial`<[`OutSettings`](../README.md#outsettings)\> |
+| `options?` | `Partial`<[`OutSettings`](../README.md#outsettings)\> |
 
 #### Returns
 
@@ -463,7 +638,7 @@ ___
 
 | Name | Type |
 | :------ | :------ |
-| `options` | `Partial`<`OutSettings`\> |
+| `options` | `Partial`<[`OutSettings`](../README.md#outsettings)\> |
 
 #### Returns
 
@@ -475,7 +650,7 @@ ___
 
 | Name | Type |
 | :------ | :------ |
-| `option` | keyof `OutSettings` |
+| `option` | keyof [`OutSettings`](../README.md#outsettings) |
 | `value` | `boolean` |
 
 #### Returns
@@ -720,6 +895,22 @@ Override the environment verbosity level
 #### Returns
 
 [`Out`](Out.md)
+
+___
+
+### toString
+
+▸ **toString**(): `string`
+
+Returns a string representation of a function.
+
+#### Returns
+
+`string`
+
+#### Inherited from
+
+Function.toString
 
 ___
 

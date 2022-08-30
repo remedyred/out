@@ -1,17 +1,16 @@
-import {ansiStyles, stripAnsi} from '@snickbit/ansi'
+import {stripAnsi} from '@snickbit/ansi'
 import {isBoolean, isCallable, isFunction, isNumber, isObject, isPrimitive, isString} from '@snickbit/utilities'
 import {template} from 'ansi-styles-template'
 import {isBrowser, isNode} from 'browser-or-node'
 import {inspect} from 'node-inspect-extracted'
 import {_console, CaseType, colorCycle, defaultState, modifiers, OutModifierMethod, OutPersistent, OutSettings, OutState, OutStyle, settings, styles} from './config'
-import {example, lineWidth, noop, terminalWidth} from './helpers'
+import {example, lineWidth, noop, terminalWidth, wrapColor} from './helpers'
 import {getLabel} from './icons'
 import {_inspect, centerText, formatCase, horizontalLine} from './render'
 import {getVerbosity, setVerbosity} from './verbosity'
 
 /**
  * Cross-platform pretty output for your terminal or browser console.
- * @noInheritDoc
  */
 export interface Out extends Function {
 
@@ -143,7 +142,6 @@ type RenderData = {
 
 /**
  * Cross-platform pretty output for your terminal or browser console.
- * @noInheritDoc
  */
 export class Out extends Function {
 	#locked: string[] = []
@@ -259,11 +257,17 @@ export class Out extends Function {
 					case 'dominant':
 					case 'verbosity':
 						break
-					case 'color':
-						this.state[prop] = style.dominant ? style[prop] : this.state?.dominant ? this.state[prop] : style[prop] || this.state[prop]
+					case 'color': {
+						if (style.dominant) {
+							this.state[prop] = style[prop]
+						} else if (!this.state?.dominant) {
+							this.state[prop] = style[prop] || this.state[prop]
+						}
+
 						if (!this.state[prop]) {
 							this.state[prop] = styles.log[prop]
 						}
+					}
 						break
 					default:
 						this.state[prop] = style[prop] !== undefined ? style[prop] : this.state[prop]
@@ -307,6 +311,126 @@ export class Out extends Function {
 	}
 
 	/**
+	 * get colorize object
+	 */
+	private getColorize() {
+		return {
+			text: text => settings.textColor && this.state.color ? wrapColor(this.state.color, text) : text,
+			color: text => this.state.color ? wrapColor(this.state.color, text) : text,
+			prefix: text => this.persistent.prefix?.color ? wrapColor(this.persistent.prefix.color, text) : text
+		}
+	}
+
+	/**
+	 * Format the message
+	 */
+	private formatMessage(string: string) {
+		const string_type = typeof string
+		const is_string = string_type === 'string'
+		const is_inspectable = isObject(string) || isCallable(string)
+		const colorize = this.getColorize()
+
+		if (is_string) {
+			if (this.state.case) {
+				string = formatCase(string, this.state.case)
+			}
+
+			const clean_string = stripAnsi(template(string))
+			let padded_string = clean_string
+			if (this.state.title) {
+				padded_string = padded_string.padStart(lineWidth(20, clean_string.length + 10), '  ')
+			} else if (this.state.center) {
+				padded_string = centerText(padded_string, this.state.center === true ? ' ' : this.state.center)
+			}
+			string = padded_string.replace(clean_string, string)
+		}
+
+		// stringify and colorize
+		if (is_string || string_type === 'number') {
+			string = colorize.text(string)
+
+			if (is_string) {
+				string = template(string)
+			}
+		} else if (!this.state.color || is_inspectable) {
+			string = _inspect(string)
+		} else {
+			string = colorize.text(_inspect(string, {colors: false}))
+		}
+
+		return string
+	}
+
+	private formatError(err: Record<string, any>, verbosity = 0) {
+		if (verbosity === 0) {
+			return err
+		}
+
+		const errObj: Record<string, any> = {}
+
+		if (err?.name) {
+			errObj.name = err.name
+		}
+
+		if (err?.message) {
+			errObj.message = err.message
+		}
+
+		if (err?.stack) {
+			errObj.stack = err.stack
+		}
+
+		if (err?.code) {
+			errObj.code = err.code
+		}
+
+		if (err?.status) {
+			errObj.status = err.status
+		}
+
+		if (err?.number) {
+			errObj.number = err.number
+		}
+
+		if (err?.fileName) {
+			errObj.fileName = err.fileName
+		}
+
+		return errObj
+	}
+
+	/**
+	 * Print the header if it exists
+	 */
+	private header(messages: RenderData) {
+		const colorize = this.getColorize()
+
+		if (this.state.title) {
+			_console.log('\n')
+		} else if (this.state.block || messages.heading) {
+			if (messages.heading) {
+				_console.log(colorize.color(centerText(`${template(`{bold}${messages.heading}{/bold}`)}`, '-')))
+			} else {
+				_console.log(colorize.color(horizontalLine('-', messages.length)))
+			}
+		}
+	}
+
+	/**
+	 * Print the footer if it exists
+	 * @param messages
+	 */
+	private footer(messages: RenderData) {
+		const colorize = this.getColorize()
+		const clean_length = messages.length
+		if (this.state.title) {
+			_console.log(colorize.color(horizontalLine('=', 20, clean_length + 8)), '\n')
+		} else if (this.state.block) {
+			_console.log(colorize.color(horizontalLine('-', clean_length)))
+		}
+	}
+
+	/**
 	 * Render the output
 	 * @private
 	 * @internal
@@ -320,129 +444,8 @@ export class Out extends Function {
 			this.state.before()
 		}
 
-		/**
-		 * get colorize object
-		 */
-		const getColorize = () => {
-			const wrapColor = (hex: string, text: string) => ansiStyles.color.ansi256(ansiStyles.hexToAnsi256(hex)) + text + ansiStyles.color.close
-			return {
-				text: text => settings.textColor && this.state.color ? wrapColor(this.state.color, text) : text,
-				color: text => this.state.color ? wrapColor(this.state.color, text) : text,
-				prefix: text => this.persistent.prefix?.color ? wrapColor(this.persistent.prefix.color, text) : text
-			}
-		}
-
-		/**
-		 * Format the message
-		 */
-		const formatMessage = (string: string) => {
-			const string_type = typeof string
-			const is_string = string_type === 'string'
-			const is_inspectable = isObject(string) || isCallable(string)
-			const colorize = getColorize()
-
-			if (is_string) {
-				if (this.state.case) {
-					string = formatCase(string, this.state.case)
-				}
-
-				const clean_string = stripAnsi(template(string))
-				let padded_string = clean_string
-				if (this.state.title) {
-					padded_string = padded_string.padStart(lineWidth(20, clean_string.length + 10), '  ')
-				} else if (this.state.center) {
-					padded_string = centerText(padded_string, this.state.center === true ? ' ' : this.state.center)
-				}
-				string = padded_string.replace(clean_string, string)
-			}
-
-			// stringify and colorize
-			if (is_string || string_type === 'number') {
-				string = colorize.text(string)
-
-				if (is_string) {
-					string = template(string)
-				}
-			} else if (!this.state.color || is_inspectable) {
-				string = _inspect(string)
-			} else {
-				string = colorize.text(_inspect(string, {colors: false}))
-			}
-
-			return string
-		}
-
-		function formatError(err: Record<string, any>, verbosity = 0) {
-			if (verbosity === 0) {
-				return err
-			}
-
-			const errObj: Record<string, any> = {}
-
-			if (err?.name) {
-				errObj.name = err.name
-			}
-
-			if (err?.message) {
-				errObj.message = err.message
-			}
-
-			if (err?.stack) {
-				errObj.stack = err.stack
-			}
-
-			if (err?.code) {
-				errObj.code = err.code
-			}
-
-			if (err?.status) {
-				errObj.status = err.status
-			}
-
-			if (err?.number) {
-				errObj.number = err.number
-			}
-
-			if (err?.fileName) {
-				errObj.fileName = err.fileName
-			}
-
-			return errObj
-		}
-
-		/**
-		 * Print the header if it exists
-		 */
-		const header = (messages: RenderData) => {
-			const colorize = getColorize()
-
-			if (this.state.title) {
-				_console.log('\n')
-			} else if (this.state.block || messages.heading) {
-				if (messages.heading) {
-					_console.log(colorize.color(centerText(`${template(`{bold}${messages.heading}{/bold}`)}`, '-')))
-				} else {
-					_console.log(colorize.color(horizontalLine('-', messages.length)))
-				}
-			}
-		}
-
-		/**
-		 * Print the footer if it exists
-		 * @param messages
-		 */
-		const footer = (messages: RenderData) => {
-			const colorize = getColorize()
-			const clean_length = messages.length
-			if (this.state.title) {
-				_console.log(colorize.color(horizontalLine('=', 20, clean_length + 8)), '\n')
-			} else if (this.state.block) {
-				_console.log(colorize.color(horizontalLine('-', clean_length)))
-			}
-		}
-
 		if (this.state.force || this.isVerbose(this.state.verbosity)) {
-			const colorize = getColorize()
+			const colorize = this.getColorize()
 
 			const data: RenderData = {
 				messages: [],
@@ -457,10 +460,10 @@ export class Out extends Function {
 
 			for (let string of args) {
 				if (string instanceof Error) {
-					string = formatError(string, this.state.verbosity)
+					string = this.formatError(string, this.state.verbosity)
 				}
 
-				const formatted = formatMessage(string)
+				const formatted = this.formatMessage(string)
 				if (typeof formatted === 'string') {
 					data.length = Math.max(data.length, stripAnsi(formatted).length)
 				}
@@ -472,7 +475,7 @@ export class Out extends Function {
 
 			if (this.state.extras && this.isVerbose(this.state.extras_verbosity)) {
 				for (const extra of this.state.extras) {
-					const formatted = formatMessage(extra)
+					const formatted = this.formatMessage(extra)
 					if (typeof formatted === 'string') {
 						data.length = Math.max(data.length, stripAnsi(formatted).length)
 					}
@@ -507,7 +510,7 @@ export class Out extends Function {
 				}
 			}
 
-			header(data)
+			this.header(data)
 
 			let has_printed_label = false
 
@@ -546,6 +549,7 @@ export class Out extends Function {
 				has_printed_group = true
 			}
 
+			// eslint-disable-next-line prefer-const
 			for (let [index, message] of data.messages.entries()) {
 				const inspectable = non_primitive_message_indexes.includes(index)
 
@@ -566,7 +570,7 @@ export class Out extends Function {
 			}
 			printGroup()
 
-			footer(data)
+			this.footer(data)
 		}
 
 		if (this.state.exit !== null && this.state.exit !== undefined) {
@@ -574,9 +578,10 @@ export class Out extends Function {
 				throw new Error(!Number.isNaN(this.state.exit) ? `Process exited with code: ${this.state.exit}` : `Process exited with error.`)
 			}
 
-			const exitCode = this.state.exit === true ? 0 : this.state.exit === false ? 1 : this.state.exit
+			const exitCode = +this.state.exit
 
 			if (isNode) {
+				// eslint-disable-next-line unicorn/no-process-exit
 				process.exit(exitCode)
 			} else {
 				throw new Error(`Process exited with code: ${exitCode}`)
@@ -677,6 +682,7 @@ export class Out extends Function {
 		message)
 		if (exit) {
 			if (isNode) {
+				// eslint-disable-next-line unicorn/no-process-exit
 				process.exit(0)
 			}
 			if (isBrowser) {

@@ -16,19 +16,8 @@ export const isVerbose = (level = 1): boolean => getVerbosity() >= level
 
 const FLAG_REGEX = /(?<flag>-v+|--verbose|--verbosity|--out)/
 const ENV_REGEX = /(?<flag>verbose|verbosity|out)/
-const APP_REGEX = /(:(?<app>[^=:]+))/
+const APP_REGEX = /(:(?<app>[^:=]+))/
 const LEVEL_REGEX = /(=(?<level>\d+))/
-
-interface MatchedArgs {
-	[key: number]: string
-	groups: {
-		flag?: string
-		app?: string
-		level?: string
-	}
-	index: number
-	input: string
-}
 
 export function getEnvVerbosity(env: Record<string, string> | string[]) {
 	if (env) {
@@ -42,10 +31,10 @@ export function getEnvVerbosity(env: Record<string, string> | string[]) {
 
 			if (reg.test(arg)) {
 				const groupReg = new RegExp(`^${is_object ? ENV_REGEX.source : FLAG_REGEX.source}${APP_REGEX.source}?${LEVEL_REGEX.source}?$`, 'gmi')
-				const parsedArgs = Array.from<MatchedArgs>(arg.matchAll(groupReg))
+				const parsedArgs = [...arg.matchAll(groupReg)]
 
 				if (parsedArgs && parsedArgs.length) {
-					for (let parsedArg of parsedArgs) {
+					for (const parsedArg of parsedArgs) {
 						const {flag, app, level} = parsedArg.groups
 
 						let parsedLevel: number
@@ -54,7 +43,7 @@ export function getEnvVerbosity(env: Record<string, string> | string[]) {
 							parsedLevel = flag.length - 1
 							increment = parsedLevel === 1
 						} else {
-							parsedLevel = level ? parseInt(level) : 1
+							parsedLevel = level ? Number.parseInt(level) : 1
 						}
 
 						if (app) {

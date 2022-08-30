@@ -45,7 +45,7 @@ export function formatCase(text, case_type) {
  * @param {object} [options]
  */
 export function _inspect(value, options = {}) {
-	return isBrowser ? value : inspect(value, {...default_inspection_options, ...options || {}})
+	return isBrowser ? value : inspect(value, {...default_inspection_options, ...options})
 }
 
 /**
@@ -62,10 +62,16 @@ export const horizontalLine = (symbol: string, min?: number, max?: number): stri
  */
 export function centerText(text: string, symbol = ' ', padding = 2) {
 	const parts = text.split('\n')
-	const text_length = Math.max(parts.reduce((a, b) => Math.max(a, stripAnsi(b).length), 0),
-		1)
+	const text_length = Math.max(longestString(parts),	1)
 	const pad_len = Math.max(Math.floor((terminalWidth() - text_length) / 2) - 2, 0)
 	const str_pad = (symbol || ' ').repeat(pad_len) + ' '.repeat(padding)
-	return parts.map(part => str_pad + part + str_pad.split('').reverse()
-		.join('')).join('\n')
+	return parts.map(part => str_pad + part + [...str_pad].reverse().join('')).join('\n')
+}
+
+function longestString(...texts) {
+	let longest = 0
+	for (const text of texts) {
+		longest = Math.max(longest, stripAnsi(text).length)
+	}
+	return longest
 }
