@@ -11,7 +11,6 @@ import {getVerbosity, setVerbosity} from './verbosity'
 
 /**
  * Cross-platform pretty output for your terminal or browser console.
- * @noInheritDoc
  */
 export interface Out extends Function {
 
@@ -143,7 +142,6 @@ type RenderData = {
 
 /**
  * Cross-platform pretty output for your terminal or browser console.
- * @noInheritDoc
  */
 export class Out extends Function {
 	#locked: string[] = []
