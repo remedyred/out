@@ -23,3 +23,5 @@ export default out as Out
 if (isBrowser) {
 	window.out = out as Out
 }
+
+export {OutSettings, CaseType} from './config'
