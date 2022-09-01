@@ -68,7 +68,7 @@ export function centerText(text: string, symbol = ' ', padding = 2) {
 	return parts.map(part => str_pad + part + [...str_pad].reverse().join('')).join('\n')
 }
 
-function longestString(...texts) {
+function longestString(texts) {
 	let longest = 0
 	for (const text of texts) {
 		longest = Math.max(longest, stripAnsi(text).length)

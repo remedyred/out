@@ -36,5 +36,7 @@ describe('Out', () => {
 })
 
 describe('Example', () => {
-	it('out.example() should not throw', () => expect(() => new Out().example()).not.toThrow())
+	it('out.example() should not throw', () => {
+		return expect(() => new Out().example()).not.toThrow()
+	})
 })
