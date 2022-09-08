@@ -10,7 +10,7 @@ specifiers:
   '@types/node': 18.6.4
   ansi-styles-template: ~1.0.0
   browser-or-node: ~2.0.0
-  concurrently: 7.3.0
+  concurrently: 7.4.0
   eslint: 8.23.0
   jest: 28.1.3
   node-inspect-extracted: ~1.1.0
@@ -37,7 +37,7 @@ devDependencies:
   '@snickbit/semantic-release': 1.5.3_semantic-release@19.0.5
   '@types/jest': 28.1.8
   '@types/node': 18.6.4
-  concurrently: 7.3.0
+  concurrently: 7.4.0
   eslint: 8.23.0
   jest: 28.1.3_@types+node@18.6.4
   semantic-release: 19.0.5
@@ -1781,8 +1781,8 @@ packages:
     resolution: {integrity: sha512-/Srv4dswyQNBfohGpz9o6Yb3Gz3SrUDqBH5rTuhGR7ahtlbYKnVxw2bCFMRljaA7EXHaXZ8wsHdodFvbkhKmqg==}
     dev: true
 
-  /concurrently/7.3.0:
-    resolution: {integrity: sha512-IiDwm+8DOcFEInca494A8V402tNTQlJaYq78RF2rijOrKEk/AOHTxhN4U1cp7GYKYX5Q6Ymh1dLTBlzIMN0ikA==}
+  /concurrently/7.4.0:
+    resolution: {integrity: sha512-M6AfrueDt/GEna/Vg9BqQ+93yuvzkSKmoTixnwEJkH0LlcGrRC2eCmjeG1tLLHIYfpYJABokqSGyMcXjm96AFA==}
     engines: {node: ^12.20.0 || ^14.13.0 || >=16.0.0}
     hasBin: true
     dependencies:
