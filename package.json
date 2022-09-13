@@ -16,17 +16,14 @@
 	],
 	"scripts": {
 		"build": "tsup --minify --dts",
-		"build:types": "tsc --emitDeclarationOnly --declarationDir dist",
 		"clean": "shx rm -rf ./dist",
 		"dev": "tsup",
-		"dev:types": "tsc --emitDeclarationOnly --declarationMap --declarationDir .types",
+		"dev:types": "tsc --project tsconfig.types.json",
 		"docs": "typedoc",
 		"start": "node ./examples/node.js",
 		"test": "jest",
 		"test:ci": "jest --ci --onlyChanged",
-		"watch": "concurrently -k -c magenta,cyan pnpm:watch:*",
-		"watch:dev": "pnpm run dev --watch",
-		"watch:types": "pnpm run dev:types --watch"
+		"watch": "pnpm run dev --watch"
 	},
 	"release": {
 		"extends": [
@@ -70,6 +67,7 @@
 			"src/index.ts"
 		],
 		"clean": true,
+		"onSuccess": "pnpm run dev:types",
 		"format": [
 			"esm",
 			"cjs"
