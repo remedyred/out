@@ -16,9 +16,9 @@ export type OutState = {
 	broken: boolean
 	throw: boolean
 	center: boolean
-	verbosity: number
+	log_level: number
 	extras: any[]
-	extras_verbosity: number
+	extras_log_level: number
 	formatter(messages: string): string
 	before(): void
 	after(): void
@@ -29,7 +29,7 @@ export type OutState = {
 export type OutPersistent = {
 	name: string
 	prefix: OutPersistentPrefix
-	verbosity: number
+	log_level: number
 }
 
 export type OutPersistentPrefix = {
@@ -44,8 +44,8 @@ export const defaultState: Partial<OutState> = {
 	label: '',
 	title: false,
 	block: false,
-	verbosity: 0, // output verbosity
-	extras_verbosity: 1,
+	log_level: 0, // output log level
+	extras_log_level: 1,
 	formatter: null,
 	before: null,
 	after: null
@@ -72,7 +72,7 @@ export type OutStyle = {
 	label?: string
 	exit?: boolean | number
 	broken?: boolean
-	verbosity?: number
+	log_level?: number
 	title?: boolean
 	block?: boolean
 	throw?: boolean
@@ -109,61 +109,61 @@ export const styles: Record<string, OutStyle> = {
 	},
 	silly: {
 		color: '#6F7783',
-		verbosity: 6,
+		log_level: 6,
 		label: 'silly'
 	},
 	trace: {
 		color: '#6F7783',
-		verbosity: 5,
+		log_level: 5,
 		label: 'trace'
 	},
 
 	warn: {
 		color: '#CCC91F',
 		dominant: true,
-		verbosity: 1,
+		log_level: 1,
 		label: 'warn'
 	},
 	debug: {
 		color: '#CC991F',
-		verbosity: 2,
+		log_level: 2,
 		label: 'debug'
 	},
 	verbose: {
 		color: '#C78822',
-		verbosity: 3,
+		log_level: 3,
 		label: 'verbose'
 	},
 	notice: {
 		color: '#C37725',
 		dominant: true,
-		verbosity: 4,
+		log_level: 4,
 		label: 'notice'
 	},
 	exception: {
 		color: '#BF6629',
 		dominant: true,
-		verbosity: -1,
+		log_level: -1,
 		label: 'exception'
 	},
 	error: {
 		color: '#BA552C',
 		dominant: true,
-		verbosity: -1,
+		log_level: -1,
 		label: 'error'
 	},
 	throw: {
 		color: '#B6442F',
 		dominant: true,
 		throw: true,
-		verbosity: -1,
+		log_level: -1,
 		label: 'error'
 	},
 	fatal: {
 		color: '#B23333',
 		dominant: true,
 		exit: 1,
-		verbosity: -1,
+		log_level: -1,
 		label: 'fatal'
 	},
 	success: {
@@ -208,10 +208,10 @@ export const modifiers: Record<string, OutModifier> = {
 export type OutSettings = {
 	[key: string]: boolean | number | string
 	textColor: boolean
-	verbosity: number
+	log_level: number
 }
 
 export const settings: OutSettings = {
 	textColor: false,
-	verbosity: 0
+	log_level: 0
 }

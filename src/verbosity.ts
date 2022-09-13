@@ -1,14 +1,14 @@
 import {isBrowser, isNode} from 'browser-or-node'
 import picomatch from 'picomatch-browser'
 
-const verbosity = {
+const log_level = {
 	global: null,
 	apps: {},
 	checked: false
 }
 
 /**
- * Check if the verbosity is at least the given level
+ * Check if the log level is at least the given level
  * @param {number} [level=1] - The level to check against
  * @returns {boolean}
  */
@@ -104,14 +104,14 @@ export function setProcessVerbosity(value, app = null) {
 			window.localStorage.setItem('out', stringifyAppValues())
 		} else {
 			verbosity.global = value
-			window.localStorage.setItem('verbosity', value)
+			window.localStorage.setItem('log_level', value)
 		}
 	}
 }
 
 /**
- * Get and parse the verbosity from the CLI
- * @param {string} [app] - The name of the app to get the verbosity for
+ * Get and parse the log level from the CLI
+ * @param {string} [app] - The name of the app to get the log level for
  * @returns {null|number}
  */
 export function getVerbosity(app: string = null) {
@@ -132,7 +132,7 @@ export function getVerbosity(app: string = null) {
 }
 
 /**
- * Temporarily set the verbosity
+ * Temporarily set the log level
  * @param {number} [level=0]
  * @param {string} [app]
  */

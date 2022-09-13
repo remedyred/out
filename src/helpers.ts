@@ -38,16 +38,16 @@ export function example() {
 
 	out.ln('Here are all of the styles you can use:')
 	for (const [name, style] of Object.entries(styles)) {
-		let styleVerbosity: number | 'forced'
-		if (style.verbosity > 0) {
-			styleVerbosity = style.verbosity
-		} else if (style.verbosity < 0) {
-			styleVerbosity = 'forced'
+		let styleLogLevel: number | 'forced'
+		if (style.log_level > 0) {
+			styleLogLevel = style.log_level
+		} else if (style.log_level < 0) {
+			styleLogLevel = 'forced'
 		} else {
-			styleVerbosity = 0
+			styleLogLevel = 0
 		}
 
-		out.force.noExit[name](`out.${name}(verbosity: ${styleVerbosity})`)
+		out.force.noExit[name](`out.${name}(verbosity: ${styleLogLevel})`)
 	}
 
 	out.ln('Log level styles will override each other:')
@@ -87,7 +87,7 @@ export function example() {
 	prefix3.write('prefix3.write()')
 
 	out.ln('You can also use new Out("prefix") to create a new instance with a prefix. This is also useful as it registers itself as a global logger.')
-	out('This will allow someone to use the --vo=yourprefix:level syntax to set the verbosity of yourprefix in Node. Check the docs for more details.')
+	out('This will allow someone to use the --out:yourprefix=level syntax to set the log level of yourprefix in Node. Check the docs for more details.')
 
 	out.ln.info('By default colors are only used as accents of the messages.')
 	out.config('textColor', true)

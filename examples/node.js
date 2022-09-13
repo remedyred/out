@@ -1,7 +1,7 @@
 const {out} = require('../dist')
 const {styles} = require('../src/config')
 
-out.block.write('Note: Verbosity detection is disabled for this example.')
+out.block.write('Note: Log level detection is disabled for this example.')
 
 out('Out can be called as a function directly to use like console.log.')
 out('out()')
@@ -13,8 +13,8 @@ out.write('out.write()', 'with different', {message: 'Variable', value: 'types'}
 
 out.ln('Here are all of the styles you can use:')
 for (const [name, style] of Object.entries(styles)) {
-	const styleVerbosity = style.verbosity > 0 ? style.verbosity : style.verbosity < 0 ? 'forced' : 0
-	out.force.noExit[name](`out.${name}(verbosity: ${styleVerbosity})`)
+	const styleLogLevel = style.log_level > 0 ? style.log_level : style.log_level < 0 ? 'forced' : 0
+	out.force.noExit[name](`out.${name}(log_level: ${styleLogLevel})`)
 }
 
 out.ln('Log level styles will override each other:')
@@ -53,7 +53,7 @@ prefix2.write('prefix2.write()')
 prefix3.write('prefix3.write()')
 
 out.ln('You can also use new Out("prefix") to create a new instance with a prefix. This is also useful as it registers itself as a global logger.')
-out('This will allow someone to use the --verbosity:yourprefix=level syntax to set the verbosity of yourprefix in Node. Check the docs for more details.')
+out('This will allow someone to use the --out:yourprefix=level syntax to set the log level of yourprefix in Node. Check the docs for more details.')
 
 out.ln.info('By default colors are only used as accents of the messages.')
 out.config('textColor', true)

@@ -115,7 +115,7 @@ export interface Out extends Function {
 	block: Out
 
 	/**
-	 * Force the output to be rendered regardless of verbosity
+	 * Force the output to be rendered regardless of log level
 	 */
 	force: Out
 
@@ -157,7 +157,7 @@ export class Out extends Function {
 	persistent: Partial<OutPersistent> = {
 		name: null,
 		prefix: undefined,
-		verbosity: 0 // override environment verbosity
+		log_level: 0 // override environment log level
 	}
 
 	constructor()
@@ -255,7 +255,7 @@ export class Out extends Function {
 				switch (prop) {
 					case 'breadcrumbs':
 					case 'dominant':
-					case 'verbosity':
+					case 'log_level':
 						break
 					case 'color': {
 						if (style.dominant) {
@@ -280,12 +280,12 @@ export class Out extends Function {
 			this.lock('force')
 		}
 
-		if (!this.isLocked('verbosity')) {
-			style.verbosity = isNumber(style.verbosity) ? style.verbosity : 0
-			this.state.verbosity = isNumber(this.state.verbosity) ? this.state.verbosity : 0
-			this.state.verbosity = style.verbosity > this.state.verbosity ? style.verbosity : this.state.verbosity
-		} else if (style.force || style.verbosity < 0) {
-			this.state.verbosity = 0
+		if (!this.isLocked('log_level')) {
+			style.log_level = isNumber(style.log_level) ? style.log_level : 0
+			this.state.log_level = isNumber(this.state.log_level) ? this.state.log_level : 0
+			this.state.log_level = style.log_level > this.state.log_level ? style.log_level : this.state.log_level
+		} else if (style.force || style.log_level < 0) {
+			this.state.log_level = 0
 		}
 
 		if (style.breadcrumbs) {
@@ -304,9 +304,8 @@ export class Out extends Function {
 		this.#clearStore(...exclusions)
 		this.clearLock()
 
-		if (this.persistent.verbosity) {
-			this.state.verbosity = this.persistent.verbosity
-			this.state.modifiersverbosity = this.persistent.verbosity
+		if (this.persistent.log_level) {
+			this.state.log_level = this.persistent.log_level
 		}
 	}
 
@@ -361,8 +360,8 @@ export class Out extends Function {
 		return string
 	}
 
-	private formatError(err: Record<string, any>, verbosity = 0) {
-		if (verbosity === 0) {
+	private formatError(err: Record<string, any>, log_level = 0) {
+		if (log_level === 0) {
 			return err
 		}
 
@@ -444,7 +443,7 @@ export class Out extends Function {
 			this.state.before()
 		}
 
-		if (this.state.force || this.isVerbose(this.state.verbosity)) {
+		if (this.state.force || this.shouldOutput(this.state.log_level)) {
 			const colorize = this.getColorize()
 
 			const data: RenderData = {
@@ -460,7 +459,7 @@ export class Out extends Function {
 
 			for (let string of args) {
 				if (string instanceof Error) {
-					string = this.formatError(string, this.state.verbosity)
+					string = this.formatError(string, this.state.log_level)
 				}
 
 				const formatted = this.formatMessage(string)
@@ -473,7 +472,7 @@ export class Out extends Function {
 				}
 			}
 
-			if (this.state.extras && this.isVerbose(this.state.extras_verbosity)) {
+			if (this.state.extras && this.shouldOutput(this.state.extras_log_level)) {
 				for (const extra of this.state.extras) {
 					const formatted = this.formatMessage(extra)
 					if (typeof formatted === 'string') {
@@ -611,7 +610,7 @@ export class Out extends Function {
 		} else {
 			Object.assign(settings, option)
 		}
-		this.persistent.verbosity = settings?.verbosity || 0
+		this.persistent.log_level = settings?.log_level || 0
 		return this.#proxy
 	}
 
@@ -671,8 +670,9 @@ export class Out extends Function {
 		_console.log(inspect({
 			state: this.state,
 			persistent: this.persistent,
-			isVerbose: this.isVerbose(),
-			getVerbosity: this.getVerbosity(),
+			shouldOutput: this.shouldOutput(),
+			getLogLevel: this.getLogLevel(),
+			getEnvLogLevel: this.getEnvLogLevel(),
 			modifiers
 		},
 		{
@@ -692,43 +692,63 @@ export class Out extends Function {
 	}
 
 	/**
-	 * Set the minimum verbosity level
+	 * Set the minimum verbosity (log level)
+	 * @param {number} [verbosity=1]
+	 * @returns {Out}
+	 * @alias Out#logLevel
 	 */
 	verbosity(verbosity?: number): Out {
-		this.state.verbosity = verbosity === undefined ? (this.state.verbosity || 0) + 1 : verbosity || 0
-		this.lock('verbosity')
+		return this.logLevel(verbosity)
+	}
+
+	/**
+	 * Set the minimum log level
+	 * @param {number} [verbosity=1]
+	 * @returns {Out}
+	 * @alias Out#logLevel
+	 */
+	v(verbosity?: number): Out {
+		return this.logLevel(verbosity)
+	}
+
+	/**
+	 * Set the minimum log level
+	 * @param {number} [level=1]
+	 * @returns {Out}
+	 */
+	logLevel(level?: number): Out {
+		this.state.log_level = level === undefined ? (this.state.log_level || 0) + 1 : level || 0
+		this.lock('log_level')
 		return this.#proxy
 	}
 
 	/**
-	 * Set the minimum verbosity level
-	 * @param {number} [verbosity=1]
-	 * @returns {Out}
+	 * Check if the environment log level is >= the given level
 	 */
-	v(verbosity?: number): Out {
-		return this.verbosity(verbosity)
+	shouldOutput(level = 1): boolean {
+		const logLevel = this.getEnvLogLevel(this.persistent.name)
+		return level <= 0 || logLevel !== undefined && logLevel >= level
 	}
 
 	/**
-	 * Check if the environment verbosity is >= the given level
+	 * Get the instance log level
 	 */
-	isVerbose(level = 1): boolean {
-		const verbosity = this.getVerbosity(this.persistent.name)
-		return level <= 0 || verbosity !== undefined && verbosity >= level
+	getLogLevel(): number {
+		return this.state.log_level || 0
 	}
 
 	/**
-	 * Get the environment verbosity
+	 * Get the environment log level
 	 */
-	getVerbosity(name?: string): number {
+	getEnvLogLevel(name?: string): number {
 		name = name || this.persistent.name
 		return getVerbosity(name)
 	}
 
 	/**
-	 * Override the environment verbosity level
+	 * Override the environment log level
 	 */
-	setVerbosity(level?: number | null): Out {
+	setEnvLogLevel(level?: number | null): Out {
 		setVerbosity(level, this.persistent.name)
 		return this.#proxy
 	}
@@ -744,7 +764,7 @@ export class Out extends Function {
 				text,
 				color: colorCycle.next()
 			}
-			this.persistent.verbosity = verbosity ?? this.persistent.verbosity
+			this.persistent.log_level = verbosity ?? this.persistent.log_level
 		}
 
 		return this.#proxy
@@ -787,7 +807,7 @@ export class Out extends Function {
 	}
 
 	/**
-	 * Add extra outputs with separate verbosity
+	 * Add extra outputs with a separate, higher log level
 	 */
 	extra(...args: any[]): Out {
 		if (!this.state.extras) {
@@ -798,21 +818,30 @@ export class Out extends Function {
 	}
 
 	/**
-	 * Set verbosity of extra outputs
+	 * Set log level of extra outputs. Default is 1
 	 */
-	extraVerbosity(extras_verbosity?: number): Out {
-		this.state.extras_verbosity = typeof extras_verbosity === 'undefined' ? (this.state.extras_verbosity || 0) + 1 : extras_verbosity || 0
-		if (!this.isLocked('extras_verbosity')) {
-			this.lock('extras_verbosity')
+	extraLogLevel(extras_verbosity?: number): Out {
+		this.state.extras_log_level = typeof extras_verbosity === 'undefined' ? (this.state.extras_log_level || 0) + 1 : extras_verbosity || 0
+		if (!this.isLocked('extras_log_level')) {
+			this.lock('extras_log_level')
 		}
 		return this.#proxy
 	}
 
 	/**
 	 * Set verbosity of extra outputs. Default is 1
+	 * @alias Out#extraLogLevel
 	 */
 	ev(extras_verbosity: number): Out {
-		return this.extraVerbosity(extras_verbosity)
+		return this.extraLogLevel(extras_verbosity)
+	}
+
+	/**
+	 * Set verbosity of extra outputs. Default is 1
+	 * @alias Out#extraLogLevel
+	 */
+	extraVerbosity(extras_verbosity: number): Out {
+		return this.extraLogLevel(extras_verbosity)
 	}
 
 	/**
@@ -851,7 +880,7 @@ export class Out extends Function {
 	 * Disable the console. Optional 'exclusions' parameter to allow specific commands
 	 */
 	disable(exclusions: string[] = []): Out {
-		if (this.isVerbose()) {
+		if (this.shouldOutput()) {
 			return this.#proxy
 		}
 		if (!exclusions.includes('log')) {
