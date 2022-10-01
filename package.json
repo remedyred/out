@@ -44,7 +44,7 @@
 		"picomatch-browser": "~2.2.6"
 	},
 	"devDependencies": {
-		"@snickbit/eslint-config": "1.3.4",
+		"@snickbit/eslint-config": "1.3.6",
 		"@snickbit/semantic-release": "^1.5.3",
 		"@types/jest": "28.1.8",
 		"@types/node": "18.6.4",
