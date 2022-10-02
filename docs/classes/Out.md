@@ -404,7 +404,7 @@ A constructor function can control which objects are recognized as its instances
 
 #### Inherited from
 
-Function.\_\_@hasInstance@59
+Function.\_\_@hasInstance@58
 
 ___
 
