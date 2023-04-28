@@ -25,3 +25,4 @@ if (isBrowser) {
 }
 
 export {OutSettings, CaseType, Verbosity} from './config'
+export {getVerbosity, setVerbosity} from './verbosity'
