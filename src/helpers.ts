@@ -1,5 +1,5 @@
 import {isNode} from 'browser-or-node'
-import {defaultWidth, styles} from './config'
+import {defaultWidth, styles, Verbosity} from './config'
 import {out} from './index'
 import {ansiStyles} from '@snickbit/ansi'
 
@@ -39,12 +39,12 @@ export function example() {
 	out.ln('Here are all of the styles you can use:')
 	for (const [name, style] of Object.entries(styles)) {
 		let styleVerbosity: number | 'forced'
-		if (style.verbosity > 0) {
+		if (style.verbosity > Verbosity.fatal) {
 			styleVerbosity = style.verbosity
-		} else if (style.verbosity < 0) {
+		} else if (style.verbosity < Verbosity.fatal) {
 			styleVerbosity = 'forced'
 		} else {
-			styleVerbosity = 0
+			styleVerbosity = Verbosity.fatal
 		}
 
 		out.force.noExit[name](`out.${name}(verbosity: ${styleVerbosity})`)

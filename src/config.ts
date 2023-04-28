@@ -37,6 +37,17 @@ export type OutPersistentPrefix = {
 	text: string
 }
 
+export enum Verbosity {
+	off = -1,
+    fatal = 0,
+    error = 1,
+	display = 2,
+	warn = 3,
+	debug = 4,
+	trace = 5,
+	all = 6
+}
+
 export const defaultState: Partial<OutState> = {
 	color: null,
 	dominant: false,
@@ -44,7 +55,7 @@ export const defaultState: Partial<OutState> = {
 	label: '',
 	title: false,
 	block: false,
-	verbosity: 0, // output verbosity
+	verbosity: Verbosity.display, // output verbosity
 	extras_verbosity: 1,
 	formatter: null,
 	before: null,
@@ -100,81 +111,84 @@ export interface OutStyles {
 export const styles: Record<string, OutStyle> = {
 	log: {
 		color: '#FFF',
-		label: 'log'
+		label: 'log',
+		verbosity: Verbosity.display
 	},
 	info: {
 		color: '#1FCCC6',
 		dominant: true,
-		label: 'info'
+		label: 'info',
+		verbosity: Verbosity.display
 	},
 	silly: {
 		color: '#6F7783',
-		verbosity: 6,
+		verbosity: Verbosity.all,
 		label: 'silly'
 	},
 	trace: {
 		color: '#6F7783',
-		verbosity: 5,
+		verbosity: Verbosity.trace,
 		label: 'trace'
 	},
-
 	warn: {
 		color: '#CCC91F',
 		dominant: true,
-		verbosity: 1,
+		verbosity: Verbosity.warn,
 		label: 'warn'
 	},
 	debug: {
 		color: '#CC991F',
-		verbosity: 2,
+		verbosity: Verbosity.debug,
 		label: 'debug'
 	},
 	verbose: {
 		color: '#C78822',
-		verbosity: 3,
+		verbosity: Verbosity.trace,
 		label: 'verbose'
 	},
 	notice: {
 		color: '#C37725',
 		dominant: true,
-		verbosity: 4,
+		verbosity: Verbosity.error,
 		label: 'notice'
 	},
 	exception: {
 		color: '#BF6629',
 		dominant: true,
-		verbosity: -1,
+		verbosity: Verbosity.error,
 		label: 'exception'
 	},
 	error: {
 		color: '#BA552C',
 		dominant: true,
-		verbosity: -1,
+		verbosity: Verbosity.error,
 		label: 'error'
 	},
 	throw: {
 		color: '#B6442F',
 		dominant: true,
 		throw: true,
-		verbosity: -1,
+		verbosity: Verbosity.display,
 		label: 'error'
 	},
 	fatal: {
 		color: '#B23333',
 		dominant: true,
 		exit: 1,
-		verbosity: -1,
+		verbosity: Verbosity.fatal,
 		label: 'fatal'
 	},
 	success: {
 		color: '#5FCC1F',
 		dominant: true,
-		label: 'success'
+		label: 'success',
+		verbosity: Verbosity.display
 	},
 	done: {
 		color: '#5FCC1F',
 		dominant: true,
 		label: 'done',
+		verbosity: Verbosity.display,
 		exit: 0
 	}
 }
@@ -213,5 +227,5 @@ export type OutSettings = {
 
 export const settings: OutSettings = {
 	textColor: false,
-	verbosity: 0
+	verbosity: Verbosity.display
 }

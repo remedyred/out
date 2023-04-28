@@ -1,4 +1,5 @@
 import {isBrowser, isNode} from 'browser-or-node'
+import {Verbosity} from './config'
 import picomatch from 'picomatch-browser'
 
 const verbosity = {
@@ -51,11 +52,13 @@ export function getEnvVerbosity(env: Record<string, string> | string[]) {
 						}
 
 						if (app) {
-							verbosity.apps[app] = increment ? (verbosity.apps[app] || 0) + parsedLevel : parsedLevel
+							verbosity.apps[app] ??= Verbosity.display
+							verbosity.apps[app] = increment ? verbosity.apps[app] + parsedLevel : parsedLevel
 						}
 
 						if (!app && flag !== '--out' || app === '*') {
-							verbosity.global = increment ? (verbosity.global || 0) + parsedLevel : parsedLevel
+							verbosity.global ??= Verbosity.display
+							verbosity.global = increment ? verbosity.global + parsedLevel : parsedLevel
 						}
 					}
 				}
@@ -65,7 +68,7 @@ export function getEnvVerbosity(env: Record<string, string> | string[]) {
 }
 
 export function processVerbosity() {
-	verbosity.global = 0
+	verbosity.global = Verbosity.display
 
 	if (isNode) {
 		getEnvVerbosity(process.env)
@@ -124,7 +127,7 @@ export function getVerbosity(app: string = null) {
 	}
 
 	if (!app || verbosity.apps['*']) {
-		return verbosity.global || 0
+		return verbosity.global || Verbosity.display
 	}
 	const matches = []
 	for (const v_app in verbosity.apps) {
@@ -137,10 +140,10 @@ export function getVerbosity(app: string = null) {
 
 /**
  * Temporarily set the verbosity
- * @param {number} [level=0]
+ * @param {Verbosity} [level=Verbosity.display]
  * @param {string} [app]
  */
-export function setVerbosity(level = 0, app = null) {
+export function setVerbosity(level = Verbosity.display, app = null) {
 	if (app) {
 		verbosity.apps[app] = level
 	} else {

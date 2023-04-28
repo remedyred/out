@@ -15,7 +15,8 @@ import {
 	OutState,
 	OutStyle,
 	settings,
-	styles
+	styles,
+	Verbosity
 } from './config'
 import {example, lineWidth, noop, terminalWidth, wrapColor} from './helpers'
 import {getLabel} from './icons'
@@ -171,7 +172,7 @@ export class Out extends Function {
 	persistent: Partial<OutPersistent> = {
 		name: null,
 		prefix: undefined,
-		verbosity: 0 // override environment verbosity
+		verbosity: Verbosity.display // override environment verbosity
 	}
 
 	constructor()
@@ -294,11 +295,11 @@ export class Out extends Function {
 		}
 
 		if (!this.isLocked('verbosity')) {
-			style.verbosity = isNumber(style.verbosity) ? style.verbosity : 0
-			this.state.verbosity = isNumber(this.state.verbosity) ? this.state.verbosity : 0
+			style.verbosity = isNumber(style.verbosity) ? style.verbosity : Verbosity.display
+			this.state.verbosity = isNumber(this.state.verbosity) ? this.state.verbosity : Verbosity.display
 			this.state.verbosity = style.verbosity > this.state.verbosity ? style.verbosity : this.state.verbosity
-		} else if (style.force || style.verbosity < 0) {
-			this.state.verbosity = 0
+		} else if (style.force) {
+			this.state.verbosity = Verbosity.fatal
 		}
 
 		if (style.breadcrumbs) {
@@ -374,8 +375,8 @@ export class Out extends Function {
 		return string
 	}
 
-	private formatError(err: Record<string, any>, verbosity = 0) {
-		if (verbosity === 0) {
+	private formatError(err: Record<string, any>, verbosity = Verbosity.display) {
+		if (verbosity < Verbosity.debug) {
 			return err
 		}
 
@@ -624,7 +625,7 @@ export class Out extends Function {
 		} else {
 			Object.assign(settings, option)
 		}
-		this.persistent.verbosity = settings?.verbosity || 0
+		this.persistent.verbosity = settings?.verbosity || Verbosity.display
 		return this.#proxy
 	}
 
@@ -717,7 +718,7 @@ export class Out extends Function {
 	 * Set the minimum verbosity level
 	 */
 	verbosity(verbosity?: number): Out {
-		this.state.verbosity = verbosity === undefined ? (this.state.verbosity || 0) + 1 : verbosity || 0
+		this.state.verbosity = isNumber(verbosity) ? verbosity : (this.state.verbosity || 0) + 1
 		this.lock('verbosity')
 		return this.#proxy
 	}
@@ -734,9 +735,8 @@ export class Out extends Function {
 	/**
 	 * Check if the environment verbosity is >= the given level
 	 */
-	isVerbose(level = 1): boolean {
-		const verbosity = this.getVerbosity(this.persistent.name)
-		return level <= 0 || verbosity !== undefined && verbosity >= level
+	isVerbose(level = Verbosity.warn): boolean {
+		return this.getVerbosity(this.persistent.name) >= level
 	}
 
 	/**
@@ -821,7 +821,7 @@ export class Out extends Function {
 	 * Set verbosity of extra outputs
 	 */
 	extraVerbosity(extras_verbosity?: number): Out {
-		this.state.extras_verbosity = extras_verbosity === undefined ? (this.state.extras_verbosity || 0) + 1 : extras_verbosity || 0
+		this.state.extras_verbosity = isNumber(extras_verbosity) ? extras_verbosity : (this.state.extras_verbosity || 0) + 1
 		if (!this.isLocked('extras_verbosity')) {
 			this.lock('extras_verbosity')
 		}

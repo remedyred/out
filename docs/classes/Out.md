@@ -86,6 +86,7 @@ Cross-platform pretty output for your terminal or browser console.
 - [label](Out.md#label)
 - [prefix](Out.md#prefix)
 - [rule](Out.md#rule)
+- [setName](Out.md#setname)
 - [setVerbosity](Out.md#setverbosity)
 - [toString](Out.md#tostring)
 - [v](Out.md#v)
@@ -818,7 +819,7 @@ Check if the environment verbosity is >= the given level
 
 | Name | Type | Default value |
 | :------ | :------ | :------ |
-| `level` | `number` | `1` |
+| `level` | `Verbosity` | `Verbosity.warn` |
 
 #### Returns
 
@@ -874,6 +875,24 @@ ___
 | `symbol?` | `string` |
 | `min?` | `number` |
 | `max?` | `number` |
+
+#### Returns
+
+[`Out`](Out.md)
+
+___
+
+### setName
+
+▸ **setName**(`name`): [`Out`](Out.md)
+
+Set the persistent name of the Out app.
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `name` | `string` |
 
 #### Returns
 
