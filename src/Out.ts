@@ -1,5 +1,14 @@
 import {stripAnsi} from '@snickbit/ansi'
-import {isBoolean, isCallable, isFunction, isNumber, isObject, isPrimitive, isString} from '@snickbit/utilities'
+import {
+	isBoolean,
+	isCallable,
+	isFunction,
+	isNullDefined,
+	isNumber,
+	isObject,
+	isPrimitive,
+	isString
+} from '@snickbit/utilities'
 import {template} from 'ansi-styles-template'
 import {isBrowser, isNode} from 'browser-or-node'
 import {inspect} from 'node-inspect-extracted'
@@ -281,6 +290,11 @@ export class Out extends Function {
 						this.state[prop] ||= styles.log[prop]
 					}
 					break
+					}
+					case 'throw':
+					case 'exit': {
+						this.state[prop] = style[prop] as any
+						break
 					}
 					default: {
 						this.state[prop] = style[prop] === undefined ? this.state[prop] : style[prop]
@@ -587,7 +601,7 @@ export class Out extends Function {
 			this.footer(data)
 		}
 
-		if (this.state.exit !== null && this.state.exit !== undefined) {
+		if (!isNullDefined(this.state.exit)) {
 			if (this.state.throw) {
 				throw new Error(Number.isNaN(this.state.exit) ? `Process exited with error.` : `Process exited with code: ${this.state.exit}`)
 			}
