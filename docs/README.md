@@ -44,7 +44,7 @@ ___
 
 ### default
 
-▸ **default**(...`messages`): [`Out`](classes/Out.md)
+▸ **default**(`...messages`): [`Out`](classes/Out.md)
 
 Cross-platform pretty output for your terminal or browser console.
 
@@ -62,7 +62,7 @@ ___
 
 ### out
 
-▸ **out**(...`messages`): [`Out`](classes/Out.md)
+▸ **out**(`...messages`): [`Out`](classes/Out.md)
 
 Cross-platform pretty output for your terminal or browser console.
 

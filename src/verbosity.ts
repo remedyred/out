@@ -25,7 +25,7 @@ export function getEnvVerbosity(env: Record<string, string> | string[]) {
 
 		for (const key in env) {
 			const arg = is_object ? `${key}=${env[key]}` : env[key]
-			const reg =	is_object
+			const reg = is_object
 				? new RegExp(`^(${ENV_REGEX.source})`)
 				: new RegExp(`^(${FLAG_REGEX.source})`)
 
@@ -35,7 +35,11 @@ export function getEnvVerbosity(env: Record<string, string> | string[]) {
 
 				if (parsedArgs && parsedArgs.length) {
 					for (const parsedArg of parsedArgs) {
-						const {flag, app, level} = parsedArg.groups
+						const {
+							flag,
+							app,
+							level
+						} = parsedArg.groups
 
 						let parsedLevel: number
 						let increment = false

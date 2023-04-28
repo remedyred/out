@@ -6,7 +6,7 @@ import {ansiStyles} from '@snickbit/ansi'
 /** @internal */
 export const lineWidth = (min?: number, max?: number): number => {
 	max = max ? Math.min(max, terminalWidth()) : terminalWidth()
-	min = min ?? 0
+	min ??= 0
 	return Math.max(Math.min(min, defaultWidth), max)
 }
 
