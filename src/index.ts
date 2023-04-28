@@ -24,4 +24,4 @@ if (isBrowser) {
 	window.out = out as Out
 }
 
-export {OutSettings, CaseType} from './config'
+export {OutSettings, CaseType, Verbosity} from './config'
