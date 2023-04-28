@@ -628,6 +628,15 @@ export class Out extends Function {
 		return this.#proxy
 	}
 
+	/**
+	 * Set the persistent name of the Out app.
+	 * @param {string} name
+	 */
+	setName(name: string): Out {
+		this.persistent.name = name
+		return this.#proxy
+	}
+
 	clone()
 
 	clone(options: Partial<OutSettings>)
