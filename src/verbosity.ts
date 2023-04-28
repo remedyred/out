@@ -139,7 +139,7 @@ export function getVerbosity(app?: string) {
 		}
 	}
 
-	return matches.length ? Math.max(...matches) : undefined
+	return matches.length ? Math.max(...matches) : (verbosity.global || Verbosity.display)
 }
 
 /**
