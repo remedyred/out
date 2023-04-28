@@ -3,7 +3,21 @@ import {isBoolean, isCallable, isFunction, isNumber, isObject, isPrimitive, isSt
 import {template} from 'ansi-styles-template'
 import {isBrowser, isNode} from 'browser-or-node'
 import {inspect} from 'node-inspect-extracted'
-import {_console, CaseType, colorCycle, defaultState, modifiers, OutModifierMethod, OutPersistent, OutSettings, OutState, OutStyle, settings, styles} from './config'
+import {
+	_console,
+	CaseType,
+	colorCycle,
+	defaultState,
+	modifiers,
+	OutModifierMethod,
+	OutPersistent,
+	OutSettings,
+	OutState,
+	OutStyle,
+	settings,
+	styles,
+	Verbosity
+} from './config'
 import {example, lineWidth, noop, terminalWidth, wrapColor} from './helpers'
 import {getLabel} from './icons'
 import {_inspect, centerText, formatCase, horizontalLine} from './render'
@@ -100,7 +114,8 @@ export interface Out extends Function {
 	broken: Out
 
 	/**
-	 * Center the text in the terminal, only works in Node.js. In the browser the text will be relatively centered with itself, but not in the entire console window.
+	 * Center the text in the terminal, only works in Node.js. In the browser the text will be relatively centered with itself,
+	 * but not in the entire console window.
 	 */
 	center: Out
 
@@ -157,7 +172,7 @@ export class Out extends Function {
 	persistent: Partial<OutPersistent> = {
 		name: null,
 		prefix: undefined,
-		verbosity: 0 // override environment verbosity
+		verbosity: Verbosity.display // override environment verbosity
 	}
 
 	constructor()
@@ -246,32 +261,31 @@ export class Out extends Function {
 	 * @internal
 	 */
 	#storeStyle(style: Partial<OutStyle>): void {
-		if (!this.state) {
-			this.state = {...defaultState, ...styles.log}
-		}
+		this.state ||= {...defaultState, ...styles.log}
 
 		for (const prop of Object.keys({...this.state, ...style})) {
 			if (!this.isLocked(prop)) {
 				switch (prop) {
 					case 'breadcrumbs':
 					case 'dominant':
-					case 'verbosity':
+					case 'verbosity': {
 						break
-					case 'color': {
+					}
+					case 'color': { {
 						if (style.dominant) {
 							this.state[prop] = style[prop]
 						} else if (!this.state?.dominant) {
 							this.state[prop] = style[prop] || this.state[prop]
 						}
 
-						if (!this.state[prop]) {
-							this.state[prop] = styles.log[prop]
-						}
+						this.state[prop] ||= styles.log[prop]
 					}
+					break
+					}
+					default: {
+						this.state[prop] = style[prop] === undefined ? this.state[prop] : style[prop]
 						break
-					default:
-						this.state[prop] = style[prop] !== undefined ? style[prop] : this.state[prop]
-						break
+					}
 				}
 			}
 		}
@@ -281,11 +295,11 @@ export class Out extends Function {
 		}
 
 		if (!this.isLocked('verbosity')) {
-			style.verbosity = isNumber(style.verbosity) ? style.verbosity : 0
-			this.state.verbosity = isNumber(this.state.verbosity) ? this.state.verbosity : 0
+			style.verbosity = isNumber(style.verbosity) ? style.verbosity : Verbosity.display
+			this.state.verbosity = isNumber(this.state.verbosity) ? this.state.verbosity : Verbosity.display
 			this.state.verbosity = style.verbosity > this.state.verbosity ? style.verbosity : this.state.verbosity
-		} else if (style.force || style.verbosity < 0) {
-			this.state.verbosity = 0
+		} else if (style.force) {
+			this.state.verbosity = Verbosity.fatal
 		}
 
 		if (style.breadcrumbs) {
@@ -361,8 +375,8 @@ export class Out extends Function {
 		return string
 	}
 
-	private formatError(err: Record<string, any>, verbosity = 0) {
-		if (verbosity === 0) {
+	private formatError(err: Record<string, any>, verbosity = Verbosity.display) {
+		if (verbosity < Verbosity.debug) {
 			return err
 		}
 
@@ -575,7 +589,7 @@ export class Out extends Function {
 
 		if (this.state.exit !== null && this.state.exit !== undefined) {
 			if (this.state.throw) {
-				throw new Error(!Number.isNaN(this.state.exit) ? `Process exited with code: ${this.state.exit}` : `Process exited with error.`)
+				throw new Error(Number.isNaN(this.state.exit) ? `Process exited with error.` : `Process exited with code: ${this.state.exit}`)
 			}
 
 			const exitCode = +this.state.exit
@@ -611,7 +625,16 @@ export class Out extends Function {
 		} else {
 			Object.assign(settings, option)
 		}
-		this.persistent.verbosity = settings?.verbosity || 0
+		this.persistent.verbosity = settings?.verbosity || Verbosity.display
+		return this.#proxy
+	}
+
+	/**
+	 * Set the persistent name of the Out app.
+	 * @param {string} name
+	 */
+	setName(name: string): Out {
+		this.persistent.name = name
 		return this.#proxy
 	}
 
@@ -695,7 +718,7 @@ export class Out extends Function {
 	 * Set the minimum verbosity level
 	 */
 	verbosity(verbosity?: number): Out {
-		this.state.verbosity = verbosity === undefined ? (this.state.verbosity || 0) + 1 : verbosity || 0
+		this.state.verbosity = isNumber(verbosity) ? verbosity : (this.state.verbosity || 0) + 1
 		this.lock('verbosity')
 		return this.#proxy
 	}
@@ -712,16 +735,15 @@ export class Out extends Function {
 	/**
 	 * Check if the environment verbosity is >= the given level
 	 */
-	isVerbose(level = 1): boolean {
-		const verbosity = this.getVerbosity(this.persistent.name)
-		return level <= 0 || verbosity !== undefined && verbosity >= level
+	isVerbose(level = Verbosity.warn): boolean {
+		return this.getVerbosity(this.persistent.name) >= level
 	}
 
 	/**
 	 * Get the environment verbosity
 	 */
 	getVerbosity(name?: string): number {
-		name = name || this.persistent.name
+		name ||= this.persistent.name
 		return getVerbosity(name)
 	}
 
@@ -737,14 +759,14 @@ export class Out extends Function {
 	 * Add a prefix to all future output for this instance
 	 */
 	prefix(text?: string, verbosity?: number | null): Out {
-		if (!text) {
-			delete this.persistent.prefix
-		} else {
+		if (text) {
 			this.persistent.prefix = {
 				text,
 				color: colorCycle.next()
 			}
 			this.persistent.verbosity = verbosity ?? this.persistent.verbosity
+		} else {
+			delete this.persistent.prefix
 		}
 
 		return this.#proxy
@@ -790,9 +812,7 @@ export class Out extends Function {
 	 * Add extra outputs with separate verbosity
 	 */
 	extra(...args: any[]): Out {
-		if (!this.state.extras) {
-			this.state.extras = []
-		}
+		this.state.extras ||= []
 		this.state.extras.push(...args)
 		return this.#proxy
 	}
@@ -801,7 +821,7 @@ export class Out extends Function {
 	 * Set verbosity of extra outputs
 	 */
 	extraVerbosity(extras_verbosity?: number): Out {
-		this.state.extras_verbosity = typeof extras_verbosity === 'undefined' ? (this.state.extras_verbosity || 0) + 1 : extras_verbosity || 0
+		this.state.extras_verbosity = isNumber(extras_verbosity) ? extras_verbosity : (this.state.extras_verbosity || 0) + 1
 		if (!this.isLocked('extras_verbosity')) {
 			this.lock('extras_verbosity')
 		}

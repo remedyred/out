@@ -4,7 +4,10 @@ on:
   push:
     branches:
       - main
-      - next
+
+env:
+  GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+  NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
 jobs:
   release:
@@ -16,8 +19,12 @@ jobs:
       issues: write
       contents: write
     steps:
-      - name: Release
-        uses: remedyred/semantic-release-action@v1.0.5
+      - uses: remedyred/check-action@v1.2.3
+        with:
+          NO_BAIL: true
+          AUTO_COMMIT: true
+
+      - uses: remedyred/semantic-release-action@v1.0.6
         with:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}

@@ -5,7 +5,7 @@ Cross-platform pretty output for your terminal or browser console.
 ## Installation
 
 ```bash
-yarn add @snickbit/out
+pnpm add @snickbit/out
 ```
 
 ```bash

@@ -10,7 +10,7 @@
 
 ### Out
 
-▸ **Out**(...`messages`): [`Out`](Out.md)
+▸ **Out**(`...messages`): [`Out`](Out.md)
 
 Cross-platform pretty output for your terminal or browser console.
 
@@ -86,6 +86,7 @@ Cross-platform pretty output for your terminal or browser console.
 - [label](Out.md#label)
 - [prefix](Out.md#prefix)
 - [rule](Out.md#rule)
+- [setName](Out.md#setname)
 - [setVerbosity](Out.md#setverbosity)
 - [toString](Out.md#tostring)
 - [v](Out.md#v)
@@ -194,7 +195,8 @@ ___
 
 • **center**: [`Out`](Out.md)
 
-Center the text in the terminal, only works in Node.js. In the browser the text will be relatively centered with itself, but not in the entire console window.
+Center the text in the terminal, only works in Node.js. In the browser the text will be relatively centered with itself,
+but not in the entire console window.
 
 ___
 
@@ -404,7 +406,7 @@ A constructor function can control which objects are recognized as its instances
 
 #### Inherited from
 
-Function.\_\_@hasInstance@58
+Function.[hasInstance]
 
 ___
 
@@ -458,7 +460,7 @@ ___
 
 ### apply
 
-▸ **apply**(`this`, ...`messages`): [`Out`](Out.md)
+▸ **apply**(`this`, `...messages`): [`Out`](Out.md)
 
 #### Parameters
 
@@ -497,7 +499,7 @@ ___
 
 ### bind
 
-▸ **bind**(`this`, `thisArg`, ...`argArray`): `any`
+▸ **bind**(`this`, `thisArg`, `...argArray`): `any`
 
 For a given function, creates a bound function that has the same body as the original function.
 The this object of the bound function is associated with the specified object, and has the specified initial parameters.
@@ -522,7 +524,7 @@ ___
 
 ### call
 
-▸ **call**(...`messages`): [`Out`](Out.md)
+▸ **call**(`...messages`): [`Out`](Out.md)
 
 #### Parameters
 
@@ -719,7 +721,7 @@ ___
 
 ### extra
 
-▸ **extra**(...`args`): [`Out`](Out.md)
+▸ **extra**(`...args`): [`Out`](Out.md)
 
 Add extra outputs with separate verbosity
 
@@ -817,7 +819,7 @@ Check if the environment verbosity is >= the given level
 
 | Name | Type | Default value |
 | :------ | :------ | :------ |
-| `level` | `number` | `1` |
+| `level` | `Verbosity` | `Verbosity.warn` |
 
 #### Returns
 
@@ -873,6 +875,24 @@ ___
 | `symbol?` | `string` |
 | `min?` | `number` |
 | `max?` | `number` |
+
+#### Returns
+
+[`Out`](Out.md)
+
+___
+
+### setName
+
+▸ **setName**(`name`): [`Out`](Out.md)
+
+Set the persistent name of the Out app.
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `name` | `string` |
 
 #### Returns
 
@@ -952,7 +972,7 @@ ___
 
 ### write
 
-▸ **write**(...`messages`): [`Out`](Out.md)
+▸ **write**(`...messages`): [`Out`](Out.md)
 
 Print the output without any extra formatting, useful for the end of chains
 

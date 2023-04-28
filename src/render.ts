@@ -11,31 +11,41 @@ import {lineWidth, terminalWidth} from './helpers'
  */
 export function formatCase(text, case_type) {
 	switch (case_type) {
-		case 'upper':
+		case 'upper': {
 			return text.toUpperCase()
-		case 'lower':
+		}
+		case 'lower': {
 			return text.toLowerCase()
+		}
 		case 'camel':
-		case 'pascal':
+		case 'pascal': {
 			return text.replace(/\s(.)/g, $1 => $1.toUpperCase()).replace(/\s/g, '')
-		case 'snake':
+		}
+		case 'snake': {
 			return text.replace(/\s/g, '_').toLowerCase()
+		}
 		case 'kebab':
-		case 'slug':
+		case 'slug': {
 			return text.replace(/\s/g, '-').toLowerCase()
-		case 'title':
+		}
+		case 'title': {
 			return text.replace(/\s(.)/g, $1 => $1.toUpperCase())
-		case 'sentence':
+		}
+		case 'sentence': {
 			return text.charAt(0).toUpperCase() + text.slice(1)
-		case 'constant':
+		}
+		case 'constant': {
 			return text
 				.replace(/\s(.)/g, $1 => $1.toUpperCase())
 				.replace(/\s/g, '_')
 				.toUpperCase()
-		case 'symbol':
+		}
+		case 'symbol': {
 			return text.replace(/\s/g, '_').toUpperCase()
-		default:
+		}
+		default: {
 			return text
+		}
 	}
 }
 
