@@ -819,7 +819,7 @@ Check if the environment verbosity is >= the given level
 
 | Name | Type | Default value |
 | :------ | :------ | :------ |
-| `level` | `Verbosity` | `Verbosity.warn` |
+| `level` | [`Verbosity`](../enums/Verbosity.md) | `Verbosity.warn` |
 
 #### Returns
 

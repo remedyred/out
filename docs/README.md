@@ -2,6 +2,10 @@
 
 ## Table of contents
 
+### Enumerations
+
+- [Verbosity](enums/Verbosity.md)
+
 ### Classes
 
 - [Out](classes/Out.md)
@@ -14,8 +18,10 @@
 ### Functions
 
 - [default](README.md#default)
+- [getVerbosity](README.md#getverbosity)
 - [out](README.md#out)
 - [outFactory](README.md#outfactory)
+- [setVerbosity](README.md#setverbosity)
 
 ## Type Aliases
 
@@ -57,6 +63,24 @@ Cross-platform pretty output for your terminal or browser console.
 #### Returns
 
 [`Out`](classes/Out.md)
+
+___
+
+### getVerbosity
+
+▸ **getVerbosity**(`app?`): `any`
+
+Get and parse the verbosity from the CLI
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `app?` | `string` | The name of the app to get the verbosity for |
+
+#### Returns
+
+`any`
 
 ___
 
@@ -104,3 +128,22 @@ ___
 #### Returns
 
 [`Out`](classes/Out.md)
+
+___
+
+### setVerbosity
+
+▸ **setVerbosity**(`level?`, `app?`): `void`
+
+Temporarily set the verbosity
+
+#### Parameters
+
+| Name | Type | Default value |
+| :------ | :------ | :------ |
+| `level?` | [`Verbosity`](enums/Verbosity.md) | `Verbosity.display` |
+| `app?` | `any` | `null` |
+
+#### Returns
+
+`void`
