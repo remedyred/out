@@ -121,7 +121,7 @@ export function setProcessVerbosity(value, app = null) {
  * @param {string} [app] - The name of the app to get the verbosity for
  * @returns {null|number}
  */
-export function getVerbosity(app: string = null) {
+export function getVerbosity(app?: string) {
 	if (!verbosity.checked) {
 		processVerbosity()
 	}
@@ -129,12 +129,16 @@ export function getVerbosity(app: string = null) {
 	if (!app || verbosity.apps['*']) {
 		return verbosity.global || Verbosity.display
 	}
+
+	verbosity.apps[app] ??= verbosity.global
+
 	const matches = []
 	for (const v_app in verbosity.apps) {
 		if (picomatch(v_app)(app)) {
 			matches.push(verbosity.apps[v_app])
 		}
 	}
+
 	return matches.length ? Math.max(...matches) : undefined
 }
 
