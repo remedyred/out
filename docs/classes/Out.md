@@ -1,5 +1,7 @@
 # Class: Out
 
+Cross-platform pretty output for your terminal or browser console.
+
 ## Hierarchy
 
 - `Function`
@@ -11,8 +13,6 @@
 ### Out
 
 ▸ **Out**(`...messages`): [`Out`](Out.md)
-
-Cross-platform pretty output for your terminal or browser console.
 
 #### Parameters
 
@@ -109,7 +109,7 @@ Function.constructor
 
 | Name | Type |
 | :------ | :------ |
-| `options` | `Partial`<[`OutSettings`](../README.md#outsettings)\> |
+| `options` | `Partial`<[`OutSettings`](../interfaces/OutSettings.md)\> |
 
 #### Inherited from
 
@@ -134,7 +134,7 @@ Function.constructor
 | Name | Type |
 | :------ | :------ |
 | `name` | `string` |
-| `options` | `Partial`<[`OutSettings`](../README.md#outsettings)\> |
+| `options` | `Partial`<[`OutSettings`](../interfaces/OutSettings.md)\> |
 
 #### Inherited from
 
@@ -146,8 +146,8 @@ Function.constructor
 
 | Name | Type |
 | :------ | :------ |
-| `name?` | `string` \| `Partial`<[`OutSettings`](../README.md#outsettings)\> |
-| `options?` | `Partial`<[`OutSettings`](../README.md#outsettings)\> |
+| `name?` | `string` \| `Partial`<[`OutSettings`](../interfaces/OutSettings.md)\> |
+| `options?` | `Partial`<[`OutSettings`](../interfaces/OutSettings.md)\> |
 
 #### Inherited from
 
@@ -552,7 +552,7 @@ Set the case of the messages, applies to all string values given to the final me
 
 | Name | Type |
 | :------ | :------ |
-| `type` | [`CaseType`](../README.md#casetype) |
+| `type` | [`CaseType`](../README.md#casetype) \| [`StringCase`](../enums/StringCase.md) |
 
 #### Returns
 
@@ -586,7 +586,7 @@ ___
 
 | Name | Type |
 | :------ | :------ |
-| `options` | `Partial`<[`OutSettings`](../README.md#outsettings)\> |
+| `options` | `Partial`<[`OutSettings`](../interfaces/OutSettings.md)\> |
 
 #### Returns
 
@@ -611,7 +611,7 @@ ___
 | Name | Type |
 | :------ | :------ |
 | `name` | `string` |
-| `options` | `Partial`<[`OutSettings`](../README.md#outsettings)\> |
+| `options` | `Partial`<[`OutSettings`](../interfaces/OutSettings.md)\> |
 
 #### Returns
 
@@ -623,8 +623,8 @@ ___
 
 | Name | Type |
 | :------ | :------ |
-| `name?` | `string` \| `Partial`<[`OutSettings`](../README.md#outsettings)\> |
-| `options?` | `Partial`<[`OutSettings`](../README.md#outsettings)\> |
+| `name?` | `string` \| `Partial`<[`OutSettings`](../interfaces/OutSettings.md)\> |
+| `options?` | `Partial`<[`OutSettings`](../interfaces/OutSettings.md)\> |
 
 #### Returns
 
@@ -640,7 +640,7 @@ ___
 
 | Name | Type |
 | :------ | :------ |
-| `options` | `Partial`<[`OutSettings`](../README.md#outsettings)\> |
+| `options` | `Partial`<[`OutSettings`](../interfaces/OutSettings.md)\> |
 
 #### Returns
 
@@ -652,7 +652,7 @@ ___
 
 | Name | Type |
 | :------ | :------ |
-| `option` | keyof [`OutSettings`](../README.md#outsettings) |
+| `option` | keyof [`OutSettings`](../interfaces/OutSettings.md) |
 | `value` | `boolean` |
 
 #### Returns
@@ -856,7 +856,7 @@ Add a prefix to all future output for this instance
 | Name | Type |
 | :------ | :------ |
 | `text?` | `string` |
-| `verbosity?` | `number` |
+| `verbosity?` | ``null`` \| `number` |
 
 #### Returns
 
@@ -910,7 +910,7 @@ Override the environment verbosity level
 
 | Name | Type |
 | :------ | :------ |
-| `level?` | `number` |
+| `level?` | ``null`` \| `number` |
 
 #### Returns
 

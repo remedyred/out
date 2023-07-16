@@ -4,16 +4,20 @@
 
 ### Enumerations
 
+- [StringCase](enums/StringCase.md)
 - [Verbosity](enums/Verbosity.md)
 
 ### Classes
 
 - [Out](classes/Out.md)
 
+### Interfaces
+
+- [OutSettings](interfaces/OutSettings.md)
+
 ### Type Aliases
 
 - [CaseType](README.md#casetype)
-- [OutSettings](README.md#outsettings)
 
 ### Functions
 
@@ -28,23 +32,6 @@
 ### CaseType
 
 Ƭ **CaseType**: ``"camel"`` \| ``"constant"`` \| ``"kebab"`` \| ``"lower"`` \| ``"none"`` \| ``"pascal"`` \| ``"sentence"`` \| ``"slug"`` \| ``"snake"`` \| ``"symbol"`` \| ``"title"`` \| ``"upper"``
-
-___
-
-### OutSettings
-
-Ƭ **OutSettings**: `Object`
-
-#### Index signature
-
-▪ [key: `string`]: `boolean` \| `number` \| `string`
-
-#### Type declaration
-
-| Name | Type |
-| :------ | :------ |
-| `textColor` | `boolean` |
-| `verbosity` | `number` |
 
 ## Functions
 
@@ -68,7 +55,7 @@ ___
 
 ### getVerbosity
 
-▸ **getVerbosity**(`app?`): `any`
+▸ **getVerbosity**(`app?`): `number`
 
 Get and parse the verbosity from the CLI
 
@@ -80,7 +67,7 @@ Get and parse the verbosity from the CLI
 
 #### Returns
 
-`any`
+`number`
 
 ___
 
@@ -110,7 +97,7 @@ ___
 
 | Name | Type |
 | :------ | :------ |
-| `options?` | `Partial`<[`OutSettings`](README.md#outsettings)\> |
+| `options?` | `Partial`<[`OutSettings`](interfaces/OutSettings.md)\> |
 
 #### Returns
 
@@ -123,7 +110,7 @@ ___
 | Name | Type |
 | :------ | :------ |
 | `name?` | `string` |
-| `options?` | `Partial`<[`OutSettings`](README.md#outsettings)\> |
+| `options?` | `Partial`<[`OutSettings`](interfaces/OutSettings.md)\> |
 
 #### Returns
 
@@ -141,8 +128,8 @@ Temporarily set the verbosity
 
 | Name | Type | Default value |
 | :------ | :------ | :------ |
-| `level?` | [`Verbosity`](enums/Verbosity.md) | `Verbosity.display` |
-| `app?` | `any` | `null` |
+| `level?` | ``null`` \| `number` | `Verbosity.display` |
+| `app?` | `string` | `undefined` |
 
 #### Returns
 
