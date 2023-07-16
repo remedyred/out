@@ -1,46 +1,46 @@
 import {stripAnsi} from '@snickbit/ansi'
 import {isBrowser} from 'browser-or-node'
 import {inspect} from 'node-inspect-extracted'
-import {default_inspection_options} from './config'
+import {default_inspection_options, StringCase} from './config'
 import {lineWidth, terminalWidth} from './helpers'
 
 /**
  * @param {string} text - The text to format
- * @param {string} [case_type] - The case type to format to
+ * @param {StringCase} [case_type] - The case type to format to
  * @returns {string}
  */
-export function formatCase(text, case_type) {
+export function formatCase(text, case_type: StringCase) {
 	switch (case_type) {
-		case 'upper': {
+		case StringCase.upper: {
 			return text.toUpperCase()
 		}
-		case 'lower': {
+		case StringCase.lower: {
 			return text.toLowerCase()
 		}
-		case 'camel':
-		case 'pascal': {
+		case StringCase.camel:
+		case StringCase.pascal: {
 			return text.replaceAll(/\s(.)/g, $1 => $1.toUpperCase()).replaceAll(/\s/g, '')
 		}
-		case 'snake': {
+		case StringCase.snake: {
 			return text.replaceAll(/\s/g, '_').toLowerCase()
 		}
-		case 'kebab':
-		case 'slug': {
+		case StringCase.kebab:
+		case StringCase.slug: {
 			return text.replaceAll(/\s/g, '-').toLowerCase()
 		}
-		case 'title': {
+		case StringCase.title: {
 			return text.replaceAll(/\s(.)/g, $1 => $1.toUpperCase())
 		}
-		case 'sentence': {
+		case StringCase.sentence: {
 			return text.charAt(0).toUpperCase() + text.slice(1)
 		}
-		case 'constant': {
+		case StringCase.constant: {
 			return text
 				.replaceAll(/\s(.)/g, $1 => $1.toUpperCase())
 				.replaceAll(/\s/g, '_')
 				.toUpperCase()
 		}
-		case 'symbol': {
+		case StringCase.symbol: {
 			return text.replaceAll(/\s/g, '_').toUpperCase()
 		}
 		default: {

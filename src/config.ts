@@ -2,45 +2,50 @@ import {Cycle} from '@snickbit/cycle'
 import {isBrowser} from 'browser-or-node'
 import {Out} from './Out'
 
-export type CaseType = 'camel' | 'constant' | 'kebab' | 'lower' | 'none' | 'pascal' | 'sentence' | 'slug' | 'snake' | 'symbol' | 'title' | 'upper'
+export type CaseType =
+	'camel'
+	| 'constant'
+	| 'kebab'
+	| 'lower'
+	| 'none'
+	| 'pascal'
+	| 'sentence'
+	| 'slug'
+	| 'snake'
+	| 'symbol'
+	| 'title'
+	| 'upper'
 
-export type OutState = {
-	force: boolean
-	dominant: boolean
-	color: string
-	label: string
-	title: boolean
-	heading: string
-	block: boolean
-	exit: boolean | number
-	broken: boolean
-	throw: boolean
-	center: boolean
-	verbosity: number
-	extras: any[]
-	extras_verbosity: number
-	formatter(messages: string): string
-	before(): void
-	after(): void
-	case: CaseType
-	[key: string]: any
+export enum StringCase {
+	camel = 'camel',
+	constant = 'constant',
+	kebab = 'kebab',
+	lower = 'lower',
+	none = 'none',
+	pascal = 'pascal',
+	sentence = 'sentence',
+	slug = 'slug',
+	snake = 'snake',
+	symbol = 'symbol',
+	title = 'title',
+	upper = 'upper'
 }
 
-export type OutPersistent = {
+export interface OutPersistent {
 	name: string
 	prefix: OutPersistentPrefix
 	verbosity: number
 }
 
-export type OutPersistentPrefix = {
+export interface OutPersistentPrefix {
 	color: string
 	text: string
 }
 
 export enum Verbosity {
 	off = -1,
-    fatal = 0,
-    error = 1,
+	fatal = 0,
+	error = 1,
 	display = 2,
 	warn = 3,
 	debug = 4,
@@ -48,18 +53,29 @@ export enum Verbosity {
 	all = 6
 }
 
-export const defaultState: Partial<OutState> = {
-	color: null,
-	dominant: false,
-	force: false,
-	label: '',
-	title: false,
-	block: false,
-	verbosity: Verbosity.display, // output verbosity
-	extras_verbosity: 1,
-	formatter: null,
-	before: null,
-	after: null
+export interface OutState {
+	[key: string]: any
+}
+
+export class OutState {
+	block = false
+	broken = false
+	case: StringCase = StringCase.none
+	center = false
+	color = ''
+	dominant = false
+	exit?: boolean | number
+	extras: any[] = []
+	extras_verbosity: Verbosity | number = Verbosity.error
+	force = false
+	heading = ''
+	label = ''
+	throw = false
+	title = false
+	verbosity: Verbosity | number = Verbosity.display
+	after?: () => void
+	before?: () => void
+	formatter?: (message: any) => any
 }
 
 export const defaultWidth = isBrowser ? 100 : 20
@@ -75,36 +91,50 @@ export const default_inspection_options = {
 
 export const colorCycle = new Cycle('hex')
 
-export type OutStyle = {
-	[key: string]: boolean | number | string
-	color?: string
+export interface OutStyle {
+	color: string
+	label: string
+	verbosity: number
 	force?: boolean
 	dominant?: boolean
-	label?: string
 	exit?: boolean | number
 	broken?: boolean
-	verbosity?: number
 	title?: boolean
 	block?: boolean
 	throw?: boolean
 	center?: boolean
 	breadcrumbs?: string
+
+	[key: string]: boolean | number | string | undefined
 }
 
 export interface OutStyles {
 	log(...messages: any): void
+
 	info(...messages: any): void
+
 	silly(...messages: any): void
+
 	trace(...messages: any): void
+
 	warn(...messages: any): void
+
 	debug(...messages: any): void
+
 	verbose(...messages: any): void
+
 	notice(...messages: any): void
+
 	exception(...messages: any): void
+
 	error(...messages: any): void
+
 	throw(...messages: any): void
+
 	fatal(...messages: any): void
+
 	success(...messages: any): void
+
 	done(...messages: any): void
 }
 
@@ -219,10 +249,11 @@ export const modifiers: Record<string, OutModifier> = {
 	}
 }
 
-export type OutSettings = {
-	[key: string]: boolean | number | string
+export interface OutSettings {
 	textColor: boolean
 	verbosity: number
+
+	[key: string]: boolean | number | string
 }
 
 export const settings: OutSettings = {

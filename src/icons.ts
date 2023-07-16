@@ -115,5 +115,5 @@ export function isUnicodeSupported(): boolean {
 		}
 	}
 
-	return is_unicode_supported
+	return !!is_unicode_supported
 }

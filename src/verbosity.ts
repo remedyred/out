@@ -2,8 +2,14 @@ import {isBrowser, isNode} from 'browser-or-node'
 import {Verbosity} from './config'
 import picomatch from 'picomatch-browser'
 
-const verbosity = {
-	global: null,
+interface VerbosityConfig {
+	global: Verbosity
+	apps: Record<string, Verbosity>
+	checked: boolean
+}
+
+const verbosity: VerbosityConfig = {
+	global: Verbosity.display,
 	apps: {},
 	checked: false
 }
@@ -20,7 +26,7 @@ const ENV_REGEX = /(?<flag>verbose|verbosity|out)/
 const APP_REGEX = /(:(?<app>[^:=]+))/
 const LEVEL_REGEX = /(=(?<level>\d+))/
 
-export function getEnvVerbosity(env: Record<string, string> | string[]) {
+export function getEnvVerbosity(env: Record<string, string> | string[] | typeof process.env) {
 	if (env) {
 		const is_object = !Array.isArray(env)
 
@@ -78,7 +84,7 @@ export function processVerbosity() {
 		const reg = new RegExp(`^(${ENV_REGEX.source})`)
 		for (let i = 0; i < localStorage.length; i++) {
 			const key = localStorage.key(i)
-			if (reg.test(key)) {
+			if (key && reg.test(key)) {
 				store[key] = localStorage.getItem(key)
 			}
 		}
@@ -127,19 +133,19 @@ export function getVerbosity(app?: string) {
 	}
 
 	if (!app || verbosity.apps['*']) {
-		return verbosity.global || Verbosity.display
+		return verbosity.global
 	}
 
 	verbosity.apps[app] ??= verbosity.global
 
-	const matches = []
+	const matches: Verbosity[] = []
 	for (const v_app in verbosity.apps) {
 		if (picomatch(v_app)(app)) {
 			matches.push(verbosity.apps[v_app])
 		}
 	}
 
-	return matches.length ? Math.max(...matches) : (verbosity.global || Verbosity.display)
+	return matches.length ? Math.max(...matches) : verbosity.global
 }
 
 /**
@@ -147,9 +153,15 @@ export function getVerbosity(app?: string) {
  * @param {Verbosity} [level=Verbosity.display]
  * @param {string} [app]
  */
-export function setVerbosity(level = Verbosity.display, app = null) {
+export function setVerbosity(level: Verbosity | number | null | undefined = Verbosity.display, app?: string) {
 	if (app) {
-		verbosity.apps[app] = level
+		if (level === undefined || level === null) {
+			delete verbosity.apps[app]
+		} else {
+			verbosity.apps[app] = level
+		}
+	} else if (level === undefined || level === null) {
+		verbosity.global = Verbosity.display
 	} else {
 		verbosity.global = level
 	}

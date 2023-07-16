@@ -98,5 +98,5 @@ export function example() {
 }
 
 export function wrapColor(hex: string, text: string) {
-	return ansiStyles.color.ansi256(ansiStyles.hexToAnsi256(hex)) + text + ansiStyles.color.close
+	return ansiStyles.color.ansi256?.(ansiStyles.hexToAnsi256(hex)) + text + ansiStyles.color.close
 }

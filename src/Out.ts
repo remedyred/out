@@ -1,14 +1,5 @@
 import {stripAnsi} from '@snickbit/ansi'
-import {
-	isBoolean,
-	isCallable,
-	isFunction,
-	isNullDefined,
-	isNumber,
-	isObject,
-	isPrimitive,
-	isString
-} from '@snickbit/utilities'
+import {isBoolean, isCallable, isFunction, isNumber, isObject, isPrimitive, isString} from '@snickbit/utilities'
 import {template} from 'ansi-styles-template'
 import {isBrowser, isNode} from 'browser-or-node'
 import {inspect} from 'node-inspect-extracted'
@@ -16,7 +7,6 @@ import {
 	_console,
 	CaseType,
 	colorCycle,
-	defaultState,
 	modifiers,
 	OutModifierMethod,
 	OutPersistent,
@@ -24,6 +14,7 @@ import {
 	OutState,
 	OutStyle,
 	settings,
+	StringCase,
 	styles,
 	Verbosity
 } from './config'
@@ -164,25 +155,25 @@ type RenderData = {
 	broken: boolean
 }
 
+const defaultState = new OutState()
+
 /**
  * Cross-platform pretty output for your terminal or browser console.
  */
 export class Out extends Function {
-	#locked: string[] = []
-
-	readonly #proxy: Out = null
-
-	#lastLink: string = null
-
 	/** @internal */
-	state: Partial<OutState> = {...defaultState}
+	state: OutState = new OutState()
 
 	/** @internal */
 	persistent: Partial<OutPersistent> = {
-		name: null,
+		name: '',
 		prefix: undefined,
 		verbosity: Verbosity.display // override environment verbosity
 	}
+
+	#locked: string[] = []
+	readonly #proxy: Out
+	#lastLink = ''
 
 	constructor()
 	constructor(options: Partial<OutSettings>)
@@ -193,9 +184,9 @@ export class Out extends Function {
 		super()
 
 		if (isString(name)) {
-			this.persistent.name = name as string
+			this.persistent.name = name
 			if (name) {
-				this.prefix(name as string)
+				this.prefix(name)
 			}
 		} else if (name) {
 			options = name as Partial<OutSettings>
@@ -249,382 +240,6 @@ export class Out extends Function {
 		return this.#proxy
 	}
 
-	/**
-	 * clear the state
-	 * @internal
-	 */
-	#clearStore(...exclusions: string[]) {
-		const state_keys = Object.keys(this.state)
-		for (const key of state_keys) {
-			if (key in defaultState) {
-				this.state[key] = defaultState[key]
-			} else if (!exclusions || !exclusions.includes(key)) {
-				delete this.state[key]
-			}
-		}
-		return this.#proxy
-	}
-
-	/**
-	 * apply the style properties to the state
-	 * @internal
-	 */
-	#storeStyle(style: Partial<OutStyle>): void {
-		this.state ||= {...defaultState, ...styles.log}
-
-		for (const prop of Object.keys({...this.state, ...style})) {
-			if (!this.isLocked(prop)) {
-				switch (prop) {
-					case 'breadcrumbs':
-					case 'dominant':
-					case 'verbosity': {
-						break
-					}
-					case 'color': { {
-						if (style.dominant) {
-							this.state[prop] = style[prop]
-						} else if (!this.state?.dominant) {
-							this.state[prop] = style[prop] || this.state[prop]
-						}
-
-						this.state[prop] ||= styles.log[prop]
-					}
-					break
-					}
-					case 'throw':
-					case 'exit': {
-						this.state[prop] = style[prop] as any
-						break
-					}
-					default: {
-						this.state[prop] = style[prop] === undefined ? this.state[prop] : style[prop]
-						break
-					}
-				}
-			}
-		}
-
-		if (this.state.force) {
-			this.lock('force')
-		}
-
-		if (!this.isLocked('verbosity')) {
-			style.verbosity = isNumber(style.verbosity) ? style.verbosity : Verbosity.display
-			this.state.verbosity = isNumber(this.state.verbosity) ? this.state.verbosity : Verbosity.display
-			this.state.verbosity = style.verbosity > this.state.verbosity ? style.verbosity : this.state.verbosity
-		} else if (style.force) {
-			this.state.verbosity = Verbosity.fatal
-		}
-
-		if (style.breadcrumbs) {
-			this.state.breadcrumbs += `:${style.label}`
-		} else {
-			this.state.breadcrumbs = this.state.label || ''
-		}
-	}
-
-	/**
-	 * reset the state
-	 * @private1
-	 * @internal
-	 */
-	#reset(...exclusions: string[]) {
-		this.#clearStore(...exclusions)
-		this.clearLock()
-
-		if (this.persistent.verbosity) {
-			this.state.verbosity = this.persistent.verbosity
-			this.state.modifiersverbosity = this.persistent.verbosity
-		}
-	}
-
-	/**
-	 * get colorize object
-	 */
-	private getColorize() {
-		return {
-			text: text => settings.textColor && this.state.color ? wrapColor(this.state.color, text) : text,
-			color: text => this.state.color ? wrapColor(this.state.color, text) : text,
-			prefix: text => this.persistent.prefix?.color ? wrapColor(this.persistent.prefix.color, text) : text
-		}
-	}
-
-	/**
-	 * Format the message
-	 */
-	private formatMessage(string: string) {
-		const string_type = typeof string
-		const is_string = string_type === 'string'
-		const is_inspectable = isObject(string) || isCallable(string)
-		const colorize = this.getColorize()
-
-		if (is_string) {
-			if (this.state.case) {
-				string = formatCase(string, this.state.case)
-			}
-
-			const clean_string = stripAnsi(template(string))
-			let padded_string = clean_string
-			if (this.state.title) {
-				padded_string = padded_string.padStart(lineWidth(20, clean_string.length + 10), '  ')
-			} else if (this.state.center) {
-				padded_string = centerText(padded_string, this.state.center === true ? ' ' : this.state.center)
-			}
-			string = padded_string.replace(clean_string, string)
-		}
-
-		// stringify and colorize
-		if (is_string || string_type === 'number') {
-			string = colorize.text(string)
-
-			if (is_string) {
-				string = template(string)
-			}
-		} else if (!this.state.color || is_inspectable) {
-			string = _inspect(string)
-		} else {
-			string = colorize.text(_inspect(string, {colors: false}))
-		}
-
-		return string
-	}
-
-	private formatError(err: Record<string, any>, verbosity = Verbosity.display) {
-		if (verbosity < Verbosity.debug) {
-			return err
-		}
-
-		const errObj: Record<string, any> = {}
-
-		if (err?.name) {
-			errObj.name = err.name
-		}
-
-		if (err?.message) {
-			errObj.message = err.message
-		}
-
-		if (err?.stack) {
-			errObj.stack = err.stack
-		}
-
-		if (err?.code) {
-			errObj.code = err.code
-		}
-
-		if (err?.status) {
-			errObj.status = err.status
-		}
-
-		if (err?.number) {
-			errObj.number = err.number
-		}
-
-		if (err?.fileName) {
-			errObj.fileName = err.fileName
-		}
-
-		return errObj
-	}
-
-	/**
-	 * Print the header if it exists
-	 */
-	private header(messages: RenderData) {
-		const colorize = this.getColorize()
-
-		if (this.state.title) {
-			_console.log('\n')
-		} else if (this.state.block || messages.heading) {
-			if (messages.heading) {
-				_console.log(colorize.color(centerText(`${template(`{bold}${messages.heading}{/bold}`)}`, '-')))
-			} else {
-				_console.log(colorize.color(horizontalLine('-', messages.length)))
-			}
-		}
-	}
-
-	/**
-	 * Print the footer if it exists
-	 * @param messages
-	 */
-	private footer(messages: RenderData) {
-		const colorize = this.getColorize()
-		const clean_length = messages.length
-		if (this.state.title) {
-			_console.log(colorize.color(horizontalLine('=', 20, clean_length + 8)), '\n')
-		} else if (this.state.block) {
-			_console.log(colorize.color(horizontalLine('-', clean_length)))
-		}
-	}
-
-	/**
-	 * Render the output
-	 * @private
-	 * @internal
-	 */
-	#render(...args: any[]): Out {
-		if (!this.state) {
-			throw new Error('No state found')
-		}
-
-		if (this.state.before) {
-			this.state.before()
-		}
-
-		if (this.state.force || this.isVerbose(this.state.verbosity)) {
-			const colorize = this.getColorize()
-
-			const data: RenderData = {
-				messages: [],
-				length: 0,
-				label: '',
-				spacer: '',
-				heading: '',
-				broken: this.state.broken
-			}
-
-			const non_primitive_message_indexes = []
-
-			for (let string of args) {
-				if (string instanceof Error) {
-					string = this.formatError(string, this.state.verbosity)
-				}
-
-				const formatted = this.formatMessage(string)
-				if (typeof formatted === 'string') {
-					data.length = Math.max(data.length, stripAnsi(formatted).length)
-				}
-				data.messages.push(formatted)
-				if (!isPrimitive(string)) {
-					non_primitive_message_indexes.push(data.messages.length - 1)
-				}
-			}
-
-			if (this.state.extras && this.isVerbose(this.state.extras_verbosity)) {
-				for (const extra of this.state.extras) {
-					const formatted = this.formatMessage(extra)
-					if (typeof formatted === 'string') {
-						data.length = Math.max(data.length, stripAnsi(formatted).length)
-					}
-					data.messages.push(formatted)
-					if (!isPrimitive(extra)) {
-						non_primitive_message_indexes.push(data.messages.length - 1)
-					}
-				}
-			}
-
-			const label_symbols = getLabel(this.state.label)
-
-			if (!this.state.title && !this.state.center && !this.state.block) {
-				data.spacer = colorize.color('|')
-				data.label = ''
-				if (this.persistent.prefix) {
-					data.label += this.persistent.prefix ? `${colorize.prefix(this.persistent.prefix.text)} ` : ''
-				}
-
-				data.label += colorize.color('#')
-
-				if (this.state.label) {
-					data.label += colorize.color(label_symbols.symbol)
-				}
-			}
-
-			if (this.state.heading || this.state.block) {
-				if (this.state.heading) {
-					data.heading = this.state.heading
-				} else if (this.state.title && label_symbols.text && !label_symbols.symbol) {
-					data.heading = this.state.label || label_symbols.text
-				}
-			}
-
-			this.header(data)
-
-			let has_printed_label = false
-
-			const message_group = []
-			let has_printed_group = false
-
-			const joinedMessages = (pull?: boolean) => (pull ? message_group.splice(0) : message_group).join(` ${data.spacer} `)
-
-			const printGroup = () => {
-				if (message_group.length) {
-					printOutput(joinedMessages(true))
-				}
-			}
-
-			const printOutput = (output: any, inspectable?: any) => {
-				let output_items = [output]
-				let output_label = ''
-				if (!has_printed_label) {
-					if (data.label) {
-						output_label = data.label
-					}
-					has_printed_label = true
-				} else if (has_printed_group) {
-					output_label = data.spacer + ' '.repeat(Math.max(stripAnsi(data.label).length - 1, 0))
-				}
-
-				if (output_label) {
-					if (inspectable) {
-						output_items.unshift(output_label)
-					} else {
-						output_items = [`${output_label} ${output}`]
-					}
-				}
-
-				_console.log(...output_items)
-				has_printed_group = true
-			}
-
-			// eslint-disable-next-line prefer-const
-			for (let [index, message] of data.messages.entries()) {
-				const inspectable = non_primitive_message_indexes.includes(index)
-
-				if (inspectable) {
-					printGroup()
-					printOutput(message, true)
-				} else {
-					if (data.broken || joinedMessages().length + message.length > terminalWidth()) {
-						printGroup()
-					}
-
-					if (this.state.formatter) {
-						message = this.state.formatter(message) || message
-					}
-
-					message_group.push(message)
-				}
-			}
-			printGroup()
-
-			this.footer(data)
-		}
-
-		if (!isNullDefined(this.state.exit)) {
-			if (this.state.throw) {
-				throw new Error(Number.isNaN(this.state.exit) ? `Process exited with error.` : `Process exited with code: ${this.state.exit}`)
-			}
-
-			const exitCode = +this.state.exit
-
-			if (isNode) {
-				// eslint-disable-next-line unicorn/no-process-exit
-				process.exit(exitCode)
-			} else {
-				throw new Error(`Process exited with code: ${exitCode}`)
-			}
-		}
-
-		this.#reset()
-
-		if (this.state.after) {
-			this.state.after()
-		}
-
-		return this.#proxy
-	}
-
 	example() {
 		return example()
 	}
@@ -635,7 +250,11 @@ export class Out extends Function {
 
 	config(option: Partial<OutSettings> | keyof OutSettings, value?: boolean | number): Out {
 		if (typeof option === 'string') {
-			settings[option] = value
+			if (value) {
+				settings[option] = value
+			} else {
+				delete settings[option]
+			}
 		} else {
 			Object.assign(settings, option)
 		}
@@ -852,8 +471,8 @@ export class Out extends Function {
 	/**
 	 * Set the case of the messages, applies to all string values given to the final method
 	 */
-	case(type: CaseType): Out {
-		this.state.case = type
+	case(type: CaseType | StringCase): Out {
+		this.state.case = type as StringCase
 		return this.#proxy
 	}
 
@@ -940,5 +559,374 @@ export class Out extends Function {
 	 */
 	isLocked(key: string): boolean {
 		return this.#locked.includes(key)
+	}
+
+	/**
+	 * clear the state
+	 * @internal
+	 */
+	#clearStore(...exclusions: string[]) {
+		const state_keys = Object.keys(this.state)
+		for (const key of state_keys) {
+			if (key in defaultState) {
+				this.state[key] = defaultState[key]
+			} else if (!exclusions || !exclusions.includes(key)) {
+				delete this.state[key]
+			}
+		}
+		return this.#proxy
+	}
+
+	/**
+	 * apply the style properties to the state
+	 * @internal
+	 */
+	#storeStyle(style: Partial<OutStyle>): void {
+		this.state ||= {...defaultState, ...styles.log}
+
+		for (const prop of Object.keys({...this.state, ...style})) {
+			if (!this.isLocked(prop)) {
+				switch (prop) {
+					case 'breadcrumbs':
+					case 'dominant':
+					case 'verbosity': {
+						break
+					}
+					case 'color': {
+						if (style.color) {
+							this.state.color = style.color
+						} else if (style.dominant || this.state?.dominant || !this.state.color) {
+							this.state.color = styles.log.color
+						}
+						break
+					}
+					case 'throw':
+					case 'exit': {
+						this.state[prop] = style[prop] as any
+						break
+					}
+					default: {
+						this.state[prop] = style[prop] === undefined ? this.state[prop] : style[prop]
+						break
+					}
+				}
+			}
+		}
+
+		if (this.state.force) {
+			this.lock('force')
+		}
+
+		if (!this.isLocked('verbosity')) {
+			style.verbosity = isNumber(style.verbosity) ? style.verbosity : Verbosity.display
+			this.state.verbosity = isNumber(this.state.verbosity) ? this.state.verbosity : Verbosity.display
+			this.state.verbosity = style.verbosity > this.state.verbosity ? style.verbosity : this.state.verbosity
+		} else if (style.force) {
+			this.state.verbosity = Verbosity.fatal
+		}
+
+		if (style.breadcrumbs) {
+			this.state.breadcrumbs += `:${style.label}`
+		} else {
+			this.state.breadcrumbs = this.state.label || ''
+		}
+	}
+
+	/**
+	 * reset the state
+	 * @private1
+	 * @internal
+	 */
+	#reset(...exclusions: string[]) {
+		this.#clearStore(...exclusions)
+		this.clearLock()
+
+		if (this.persistent.verbosity) {
+			this.state.verbosity = this.persistent.verbosity
+			this.state.modifiersverbosity = this.persistent.verbosity
+		}
+	}
+
+	/**
+	 * get colorize object
+	 */
+	private getColorize() {
+		return {
+			text: text => settings.textColor && this.state.color ? wrapColor(this.state.color, text) : text,
+			color: text => this.state.color ? wrapColor(this.state.color, text) : text,
+			prefix: text => this.persistent.prefix?.color ? wrapColor(this.persistent.prefix.color, text) : text
+		}
+	}
+
+	/**
+	 * Format the message
+	 */
+	private formatMessage(string: string) {
+		const string_type = typeof string
+		const is_string = string_type === 'string'
+		const is_inspectable = isObject(string) || isCallable(string)
+		const colorize = this.getColorize()
+
+		if (is_string) {
+			if (this.state.case) {
+				string = formatCase(string, this.state.case)
+			}
+
+			const clean_string = stripAnsi(template(string))
+			let padded_string = clean_string
+			if (this.state.title) {
+				padded_string = padded_string.padStart(lineWidth(20, clean_string.length + 10), '  ')
+			} else if (this.state.center) {
+				padded_string = centerText(padded_string, this.state.center ? ' ' : this.state.center)
+			}
+			string = padded_string.replace(clean_string, string)
+		}
+
+		// stringify and colorize
+		if (is_string || string_type === 'number') {
+			string = colorize.text(string)
+
+			if (is_string) {
+				string = template(string)
+			}
+		} else if (!this.state.color || is_inspectable) {
+			string = _inspect(string)
+		} else {
+			string = colorize.text(_inspect(string, {colors: false}))
+		}
+
+		return string
+	}
+
+	private formatError(err: Record<string, any>, verbosity = Verbosity.display) {
+		if (verbosity < Verbosity.debug) {
+			return err
+		}
+
+		const errObj: Record<string, any> = {}
+
+		if (err?.name) {
+			errObj.name = err.name
+		}
+
+		if (err?.message) {
+			errObj.message = err.message
+		}
+
+		if (err?.stack) {
+			errObj.stack = err.stack
+		}
+
+		if (err?.code) {
+			errObj.code = err.code
+		}
+
+		if (err?.status) {
+			errObj.status = err.status
+		}
+
+		if (err?.number) {
+			errObj.number = err.number
+		}
+
+		if (err?.fileName) {
+			errObj.fileName = err.fileName
+		}
+
+		return errObj
+	}
+
+	/**
+	 * Print the header if it exists
+	 */
+	private header(messages: RenderData) {
+		const colorize = this.getColorize()
+
+		if (this.state.title) {
+			_console.log('\n')
+		} else if (this.state.block || messages.heading) {
+			if (messages.heading) {
+				_console.log(colorize.color(centerText(`${template(`{bold}${messages.heading}{/bold}`)}`, '-')))
+			} else {
+				_console.log(colorize.color(horizontalLine('-', messages.length)))
+			}
+		}
+	}
+
+	/**
+	 * Print the footer if it exists
+	 * @param messages
+	 */
+	private footer(messages: RenderData) {
+		const colorize = this.getColorize()
+		const clean_length = messages.length
+		if (this.state.title) {
+			_console.log(colorize.color(horizontalLine('=', 20, clean_length + 8)), '\n')
+		} else if (this.state.block) {
+			_console.log(colorize.color(horizontalLine('-', clean_length)))
+		}
+	}
+
+	/**
+	 * Render the output
+	 * @private
+	 * @internal
+	 */
+	#render(...args: any[]): Out {
+		if (!this.state) {
+			throw new Error('No state found')
+		}
+
+		if (this.state.before) {
+			this.state.before()
+		}
+
+		if (this.state.force || this.isVerbose(this.state.verbosity)) {
+			const colorize = this.getColorize()
+
+			const data: RenderData = {
+				messages: [],
+				length: 0,
+				label: '',
+				spacer: '',
+				heading: '',
+				broken: this.state.broken
+			}
+
+			const non_primitive_message_indexes: number[] = []
+
+			for (let string of args) {
+				if (string instanceof Error) {
+					string = this.formatError(string, this.state.verbosity)
+				}
+
+				const formatted = this.formatMessage(string)
+				data.length = Math.max(data.length, stripAnsi(formatted).length)
+				data.messages.push(formatted)
+				if (!isPrimitive(string)) {
+					non_primitive_message_indexes.push(data.messages.length - 1)
+				}
+			}
+
+			if (this.state.extras && this.isVerbose(this.state.extras_verbosity)) {
+				for (const extra of this.state.extras) {
+					const formatted = this.formatMessage(extra)
+					data.length = Math.max(data.length, stripAnsi(formatted).length)
+					data.messages.push(formatted)
+					if (!isPrimitive(extra)) {
+						non_primitive_message_indexes.push(data.messages.length - 1)
+					}
+				}
+			}
+
+			const label_symbols = getLabel(this.state.label)
+
+			if (!this.state.title && !this.state.center && !this.state.block) {
+				data.spacer = colorize.color('|')
+				data.label = ''
+				if (this.persistent.prefix) {
+					data.label += this.persistent.prefix ? `${colorize.prefix(this.persistent.prefix.text)} ` : ''
+				}
+
+				data.label += colorize.color('#')
+
+				if (this.state.label) {
+					data.label += colorize.color(label_symbols.symbol)
+				}
+			}
+
+			if (this.state.heading || this.state.block) {
+				if (this.state.heading) {
+					data.heading = this.state.heading
+				} else if (this.state.title && label_symbols.text && !label_symbols.symbol) {
+					data.heading = this.state.label || label_symbols.text
+				}
+			}
+
+			this.header(data)
+
+			let has_printed_label = false
+
+			const message_group: any[] = []
+			let has_printed_group = false
+
+			const joinedMessages = (pull?: boolean) => (pull ? message_group.splice(0) : message_group).join(` ${data.spacer} `)
+
+			const printGroup = () => {
+				if (message_group.length) {
+					printOutput(joinedMessages(true))
+				}
+			}
+
+			const printOutput = (output: any, inspectable?: any) => {
+				let output_items = [output]
+				let output_label = ''
+				if (!has_printed_label) {
+					if (data.label) {
+						output_label = data.label
+					}
+					has_printed_label = true
+				} else if (has_printed_group) {
+					output_label = data.spacer + ' '.repeat(Math.max(stripAnsi(data.label).length - 1, 0))
+				}
+
+				if (output_label) {
+					if (inspectable) {
+						output_items.unshift(output_label)
+					} else {
+						output_items = [`${output_label} ${output}`]
+					}
+				}
+
+				_console.log(...output_items)
+				has_printed_group = true
+			}
+
+			// eslint-disable-next-line prefer-const
+			for (let [index, message] of data.messages.entries()) {
+				const inspectable = non_primitive_message_indexes.includes(index)
+
+				if (inspectable) {
+					printGroup()
+					printOutput(message, true)
+				} else {
+					if (data.broken || joinedMessages().length + message.length > terminalWidth()) {
+						printGroup()
+					}
+
+					if (this.state.formatter) {
+						message = this.state.formatter(message) || message
+					}
+
+					message_group.push(message)
+				}
+			}
+			printGroup()
+
+			this.footer(data)
+		}
+
+		if (this.state.exit !== undefined) {
+			if (this.state.throw) {
+				throw new Error(Number.isNaN(this.state.exit) ? `Process exited with error.` : `Process exited with code: ${this.state.exit}`)
+			}
+
+			const exitCode = +this.state.exit
+
+			if (isNode) {
+				// eslint-disable-next-line unicorn/no-process-exit
+				process.exit(exitCode)
+			} else {
+				throw new Error(`Process exited with code: ${exitCode}`)
+			}
+		}
+
+		this.#reset()
+
+		if (this.state.after) {
+			this.state.after()
+		}
+
+		return this.#proxy
 	}
 }
