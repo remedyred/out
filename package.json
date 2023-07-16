@@ -15,17 +15,15 @@
 		"dist"
 	],
 	"scripts": {
-		"build": "tsup --minify --dts",
-		"clean": "shx rm -rf ./dist",
-		"dev": "tsup",
-		"dev:types": "tsc --project tsconfig.types.json",
+		"build": "tsup --minify",
+		"check": "pnpm run lint && pnpm run typecheck",
+		"dev": "tsup --watch",
 		"lint": "eslint \"**/*.{ts,json,yml,yaml}\" --cache --color",
 		"lint:fix": "pnpm run lint --fix",
+		"test": "jest --ci",
+		"typecheck": "tsc --noEmit",
 		"docs": "typedoc",
-		"start": "node ./examples/node.js",
-		"test": "jest",
-		"test:ci": "jest --ci --onlyChanged",
-		"watch": "pnpm run dev --watch"
+		"start": "node ./examples/node.js"
 	},
 	"release": {
 		"extends": [
@@ -68,8 +66,8 @@
 		"entry": [
 			"src/index.ts"
 		],
+		"dts": true,
 		"clean": true,
-		"onSuccess": "pnpm run dev:types",
 		"format": [
 			"esm",
 			"cjs"
