@@ -19,29 +19,29 @@ export function formatCase(text, case_type) {
 		}
 		case 'camel':
 		case 'pascal': {
-			return text.replace(/\s(.)/g, $1 => $1.toUpperCase()).replace(/\s/g, '')
+			return text.replaceAll(/\s(.)/g, $1 => $1.toUpperCase()).replaceAll(/\s/g, '')
 		}
 		case 'snake': {
-			return text.replace(/\s/g, '_').toLowerCase()
+			return text.replaceAll(/\s/g, '_').toLowerCase()
 		}
 		case 'kebab':
 		case 'slug': {
-			return text.replace(/\s/g, '-').toLowerCase()
+			return text.replaceAll(/\s/g, '-').toLowerCase()
 		}
 		case 'title': {
-			return text.replace(/\s(.)/g, $1 => $1.toUpperCase())
+			return text.replaceAll(/\s(.)/g, $1 => $1.toUpperCase())
 		}
 		case 'sentence': {
 			return text.charAt(0).toUpperCase() + text.slice(1)
 		}
 		case 'constant': {
 			return text
-				.replace(/\s(.)/g, $1 => $1.toUpperCase())
-				.replace(/\s/g, '_')
+				.replaceAll(/\s(.)/g, $1 => $1.toUpperCase())
+				.replaceAll(/\s/g, '_')
 				.toUpperCase()
 		}
 		case 'symbol': {
-			return text.replace(/\s/g, '_').toUpperCase()
+			return text.replaceAll(/\s/g, '_').toUpperCase()
 		}
 		default: {
 			return text
