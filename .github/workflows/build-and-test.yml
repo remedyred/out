@@ -5,11 +5,12 @@ on:
     types: [opened, synchronize]
 
 jobs:
-  build:
-    name: Build, Lint, and Test
+  check:
+    name: Build Checks
     timeout-minutes: 5
     runs-on: ubuntu-latest
     steps:
-      - uses: remedyred/check-action@v1.2.3
+      - name: Build, Test, and Lint
+        uses: remedyred/check-action@v1.2.7
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

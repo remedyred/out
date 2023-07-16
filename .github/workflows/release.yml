@@ -14,17 +14,12 @@ jobs:
     name: Release
     timeout-minutes: 30
     runs-on: ubuntu-latest
-    permissions:
-      pull-requests: write
-      issues: write
-      contents: write
     steps:
-      - uses: remedyred/check-action@v1.2.3
+      - name: Build, Test, and Lint
+        uses: remedyred/check-action@v1.2.7
         with:
           NO_BAIL: true
           AUTO_COMMIT: true
 
-      - uses: remedyred/semantic-release-action@v1.0.6
-        with:
-          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - name: Release
+        run: pnpm semantic-release
