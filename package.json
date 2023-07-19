@@ -36,8 +36,8 @@
 	},
 	"dependencies": {
 		"@snickbit/ansi": "0.0.26",
-		"@snickbit/cycle": "1.0.21",
-		"@snickbit/utilities": "3.11.0",
+		"@snickbit/cycle": "1.0.22",
+		"@snickbit/utilities": "3.11.1",
 		"ansi-styles-template": "1.0.0",
 		"browser-or-node": "2.1.1",
 		"node-inspect-extracted": "3.0.0",

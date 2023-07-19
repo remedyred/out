@@ -9,11 +9,11 @@ dependencies:
     specifier: 0.0.26
     version: 0.0.26
   '@snickbit/cycle':
-    specifier: 1.0.21
-    version: 1.0.21
+    specifier: 1.0.22
+    version: 1.0.22
   '@snickbit/utilities':
-    specifier: 3.11.0
-    version: 3.11.0
+    specifier: 3.11.1
+    version: 3.11.1
   ansi-styles-template:
     specifier: 1.0.0
     version: 1.0.0
@@ -1446,11 +1446,11 @@ packages:
     engines: {node: '>= 12'}
     dev: false
 
-  /@snickbit/cycle@1.0.21:
-    resolution: {integrity: sha512-4OgOHzvl/hREsNt2OoNq7egfS5VC2gkf6v395mjGOnRsfv3i0BbnywEcYGC9Rxr3Bl70nBZ/Dsix2UEhmAHviw==}
+  /@snickbit/cycle@1.0.22:
+    resolution: {integrity: sha512-CSpYar5gFwvpCZSuvIpeaqNC313rhwE0glGETarMl/r16fZifo4lcrj1+XjL98CpC3g5aRoG7K546oAdeZukSg==}
     engines: {node: '>= 14.17'}
     dependencies:
-      '@snickbit/utilities': 3.11.0
+      '@snickbit/utilities': 3.11.1
     dev: false
 
   /@snickbit/eslint-config@1.5.3(eslint@8.45.0)(jest@29.6.1)(typescript@5.1.6):
@@ -1480,8 +1480,8 @@ packages:
       - typescript
     dev: true
 
-  /@snickbit/plural@1.0.14:
-    resolution: {integrity: sha512-i3A2CllbJ1a+xNwQ/n/HBCTdFTwdCdKrlDvrwg2rrTXzKFhkFpE3/GUXxDnobZJUhMSyFnVFF6yvN2BSnZBKHQ==}
+  /@snickbit/plural@1.0.18:
+    resolution: {integrity: sha512-BPf935z4FabSXGA4cTT9q9GbU6K4Ykaw7dk1QtpOJmEK2u+lYog96wm5GfZ2F/ITbyl4JMRRKyWjbLllP6Z4Lw==}
     engines: {node: '>= 14.17'}
     dev: false
 
@@ -1502,12 +1502,12 @@ packages:
       - supports-color
     dev: true
 
-  /@snickbit/utilities@3.11.0:
-    resolution: {integrity: sha512-YMSWxOhX9q7jeeE48MvCtueCLKVp48EwXgL6IDOuCmEqyG65OZ0SaYJy2gPz1RMCjRcQYJTfylG15eDhamcCww==}
+  /@snickbit/utilities@3.11.1:
+    resolution: {integrity: sha512-vEi4bRO/0raCVe6jAa7+9tMtVqeBGqawzbFCGm1gffwlzTVk8U4DyxJxkvuBjI1Oz8WnRrYiwZTwbHoB8Kkolw==}
     engines: {node: '>= 14.17'}
     dependencies:
       '@lukeed/uuid': 2.0.1
-      '@snickbit/plural': 1.0.14
+      '@snickbit/plural': 1.0.18
       just-camel-case: 6.2.0
     dev: false
 
