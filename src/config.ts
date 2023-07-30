@@ -73,8 +73,8 @@ export class OutState {
 	throw = false
 	title = false
 	verbosity: Verbosity | number = Verbosity.display
-	after?: () => void
-	before?: () => void
+	after?: (state: OutState) => OutState | undefined | void
+	before?: (state: OutState) => OutState | undefined | void
 	formatter?: (message: any) => any
 }
 

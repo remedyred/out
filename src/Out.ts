@@ -420,7 +420,7 @@ export class Out extends Function {
 	/**
 	 * Add a callback to be called before rendering the output
 	 */
-	before(callback: () => void): Out {
+	before(callback: (state: OutState) => OutState | undefined | void): Out {
 		if (!isCallable(callback)) {
 			throw new Error('The callback must be a synchronous function')
 		}
@@ -432,7 +432,7 @@ export class Out extends Function {
 	/**
 	 * Add a callback to be called after rendering the output
 	 */
-	after(callback: () => void): Out {
+	after(callback: (state: OutState) => OutState | undefined | void): Out {
 		if (!isCallable(callback)) {
 			throw new Error('The callback must be a synchronous function')
 		}
@@ -778,7 +778,10 @@ export class Out extends Function {
 		}
 
 		if (this.state.before) {
-			this.state.before()
+			const beforeResults = this.state.before({...this.state})
+			if (beforeResults) {
+				this.state = beforeResults
+			}
 		}
 
 		if (this.state.force || this.isVerbose(this.state.verbosity)) {
@@ -924,7 +927,10 @@ export class Out extends Function {
 		this.#reset()
 
 		if (this.state.after) {
-			this.state.after()
+			const afterResults = this.state.after({...this.state})
+			if (afterResults) {
+				this.state = afterResults
+			}
 		}
 
 		return this.#proxy
