@@ -450,7 +450,7 @@ Add a callback to be called after rendering the output
 
 | Name | Type |
 | :------ | :------ |
-| `callback` | () => `void` |
+| `callback` | (`state`: `OutState`) => `undefined` \| `void` \| `OutState` |
 
 #### Returns
 
@@ -489,7 +489,7 @@ Add a callback to be called before rendering the output
 
 | Name | Type |
 | :------ | :------ |
-| `callback` | () => `void` |
+| `callback` | (`state`: `OutState`) => `undefined` \| `void` \| `OutState` |
 
 #### Returns
 
