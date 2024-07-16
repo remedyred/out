@@ -1,5 +1,14 @@
 import {stripAnsi} from '@snickbit/ansi'
-import {isBoolean, isCallable, isFunction, isNumber, isObject, isPrimitive, isString} from '@snickbit/utilities'
+import {
+	AnyFunction,
+	isBoolean,
+	isCallable,
+	isFunction,
+	isNumber,
+	isObject,
+	isPrimitive,
+	isString
+} from '@snickbit/utilities'
 import {template} from 'ansi-styles-template'
 import {isBrowser, isNode} from 'browser-or-node'
 import {inspect} from 'node-inspect-extracted'
@@ -215,7 +224,7 @@ export class Out extends Function {
 
 				const targetProp = prop as keyof Out
 				if (targetProp in target && isFunction(target[targetProp])) {
-					return target[targetProp].bind(target)
+					return (target[targetProp] as AnyFunction).bind(target)
 				}
 
 				return Reflect.get(target, prop, receiver)
