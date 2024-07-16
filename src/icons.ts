@@ -90,15 +90,15 @@ export function getLabel(symbol: string): LabelDefinition {
 	}
 }
 
-let is_unicode_supported: boolean | undefined
+let _isUnicodeSupported: boolean | undefined
 
 /**
  * Check if unicode is supported
  */
 export function isUnicodeSupported(): boolean {
-	if (is_unicode_supported === undefined) {
+	if (_isUnicodeSupported === undefined) {
 		if (isBrowser) {
-			is_unicode_supported = true
+			_isUnicodeSupported = true
 		} else if (isNode) {
 			const tests = {
 				is_not_windows_and_not_term_linux: process.platform !== 'win32' && process.env.TERM !== 'linux',
@@ -111,9 +111,9 @@ export function isUnicodeSupported(): boolean {
 				is_alacritty: process.env.TERM === 'alacritty'
 			}
 
-			is_unicode_supported = Object.values(tests).some(Boolean)
+			_isUnicodeSupported = Object.values(tests).some(Boolean)
 		}
 	}
 
-	return !!is_unicode_supported
+	return !!_isUnicodeSupported
 }

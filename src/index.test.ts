@@ -1,4 +1,4 @@
-import {Out} from '../src'
+import {Out} from './Out'
 
 describe('Out', () => {
 	it('new Out() should be an instance of Out', () => expect(new Out()).toBeInstanceOf(Out))

@@ -1,7 +1,7 @@
-import {Out} from '../src'
+import {Out} from './Out'
 
 describe('Out', () => {
-	let instance
+	let instance: Out
 	beforeEach(() => {
 		instance = new Out()
 	})
