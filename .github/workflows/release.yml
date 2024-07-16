@@ -16,10 +16,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Build, Test, and Lint
-        uses: remedyred/check-action@v1.2.9
+        uses: remedyred/check-action@v1.2.10
         with:
           NO_BAIL: true
           AUTO_COMMIT: true
+          AUTOFIX_LOCKFILE: false
 
       - name: Release
         run: pnpm semantic-release
