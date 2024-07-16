@@ -305,7 +305,8 @@ export class Out extends Function {
 	}
 
 	rule(symbol?: string, min?: number, max?: number): Out {
-		return this.write(horizontalLine(symbol || '-', min ?? 20, max))
+		_console.log(horizontalLine(symbol || '-', min ?? 20, max))
+		return this.#proxy
 	}
 
 	/**
