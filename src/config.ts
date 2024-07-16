@@ -53,6 +53,7 @@ export enum Verbosity {
 	all = 6
 }
 
+/** @internal */
 export interface OutState {
 	[key: string]: any
 }
