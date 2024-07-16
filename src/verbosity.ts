@@ -16,10 +16,10 @@ const verbosity: VerbosityConfig = {
 
 /**
  * Check if the verbosity is at least the given level
- * @param {number} [level=1] - The level to check against
- * @returns {boolean}
  */
-export const isVerbose = (level = 1): boolean => getVerbosity() >= level
+export function isVerbose(level = 1): boolean {
+	return getVerbosity() >= level
+}
 
 const FLAG_REGEX = /(?<flag>-v+|--verbose|--verbosity|--out)/
 const ENV_REGEX = /(?<flag>verbose|verbosity|out)/
@@ -102,14 +102,14 @@ function stringifyAppValues() {
 		.join(',')
 }
 
-export function setProcessVerbosity(value, app = null) {
+export function setProcessVerbosity(value: Verbosity, app = null) {
 	if (isNode) {
 		if (app) {
 			verbosity.apps[app] = value
 			process.env.OUT = stringifyAppValues()
 		} else {
 			verbosity.global = value
-			process.env.VERBOSE = value
+			process.env.VERBOSE = String(value)
 		}
 	} else if (isBrowser) {
 		if (app) {
@@ -117,17 +117,15 @@ export function setProcessVerbosity(value, app = null) {
 			window.localStorage.setItem('out', stringifyAppValues())
 		} else {
 			verbosity.global = value
-			window.localStorage.setItem('verbosity', value)
+			window.localStorage.setItem('verbosity', String(value))
 		}
 	}
 }
 
 /**
  * Get and parse the verbosity from the CLI
- * @param {string} [app] - The name of the app to get the verbosity for
- * @returns {null|number}
  */
-export function getVerbosity(app?: string) {
+export function getVerbosity(app?: string): number {
 	if (!verbosity.checked) {
 		processVerbosity()
 	}

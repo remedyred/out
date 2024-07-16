@@ -1,24 +1,21 @@
+[**@snickbit/out**](../README.md) • **Docs**
+
+***
+
 # Interface: OutSettings
 
 ## Indexable
 
-▪ [key: `string`]: `boolean` \| `number` \| `string`
-
-## Table of contents
-
-### Properties
-
-- [textColor](OutSettings.md#textcolor)
-- [verbosity](OutSettings.md#verbosity)
+ \[`key`: `string`\]: `boolean` \| `number` \| `string`
 
 ## Properties
 
 ### textColor
 
-• **textColor**: `boolean`
+> **textColor**: `boolean`
 
-___
+***
 
 ### verbosity
 
-• **verbosity**: `number`
+> **verbosity**: `number`

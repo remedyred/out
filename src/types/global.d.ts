@@ -1,4 +1,4 @@
-import {Out} from './Out'
+import {Out} from '@/Out'
 
 declare global {
 	interface Window {

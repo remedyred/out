@@ -3,8 +3,14 @@ import {defaultWidth, styles, Verbosity} from './config'
 import {out} from './index'
 import {ansiStyles} from '@snickbit/ansi'
 
-/** @internal */
-export const lineWidth = (min?: number, max?: number): number => {
+/**
+ * Calculates the desired line width value based on optional minimum and maximum values.
+ * If no minimum value is provided, the minimum line width will default to 0.
+ * If no maximum value is provided, the maximum line width will be the terminal width.
+ *
+ * @internal
+ */
+export function lineWidth(min?: number, max?: number): number {
 	max = max ? Math.min(max, terminalWidth()) : terminalWidth()
 	min ??= 0
 	return Math.max(Math.min(min, defaultWidth), max)
@@ -13,9 +19,10 @@ export const lineWidth = (min?: number, max?: number): number => {
 /**
  * Determine the width of the terminal
  * @internal
- * @returns {number|number}
  */
-export const terminalWidth = () => (isNode && process.stdout.isTTY ? process.stdout.columns : defaultWidth) || defaultWidth
+export function terminalWidth() {
+	return (isNode && process.stdout.isTTY ? process.stdout.columns : defaultWidth) || defaultWidth
+}
 
 /**
  * Noop function
@@ -24,7 +31,10 @@ export const terminalWidth = () => (isNode && process.stdout.isTTY ? process.std
 /* eslint @typescript-eslint/no-empty-function: off */
 export const noop = () => {}
 
-/** @internal */
+/**
+ * This method provides an example of using the Out library to output messages with different styles and modifiers.
+ * @internal
+ */
 export function example() {
 	out.block.write('Note: Verbosity detection is disabled for this example.')
 
@@ -36,7 +46,7 @@ export function example() {
 	out.write('out.write()', 'with', 'multiple', 'arguments')
 	out.write('out.write()', 'with different', {message: 'Variable', value: 'types'})
 
-	out.ln('Here are all of the styles you can use:')
+	out.ln('Here are all the styles you can use:')
 	for (const [name, style] of Object.entries(styles)) {
 		let styleVerbosity: number | 'forced'
 		if (style.verbosity > Verbosity.fatal) {
@@ -89,7 +99,7 @@ export function example() {
 	out.ln('You can also use new Out("prefix") to create a new instance with a prefix. This is also useful as it registers itself as a global logger.')
 	out('This will allow someone to use the --vo=yourprefix:level syntax to set the verbosity of yourprefix in Node. Check the docs for more details.')
 
-	out.ln.info('By default colors are only used as accents of the messages.')
+	out.ln.info('By default, colors are only used as accents of the messages.')
 	out.config('textColor', true)
 	out.info('However, can enable full text color with out.config("textColor", true) or when create a new instance of out new Out({textColor: true})')
 	out.config('textColor', false)

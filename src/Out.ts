@@ -1,5 +1,14 @@
 import {stripAnsi} from '@snickbit/ansi'
-import {isBoolean, isCallable, isFunction, isNumber, isObject, isPrimitive, isString} from '@snickbit/utilities'
+import {
+	AnyFunction,
+	isBoolean,
+	isCallable,
+	isFunction,
+	isNumber,
+	isObject,
+	isPrimitive,
+	isString
+} from '@snickbit/utilities'
 import {template} from 'ansi-styles-template'
 import {isBrowser, isNode} from 'browser-or-node'
 import {inspect} from 'node-inspect-extracted'
@@ -215,7 +224,7 @@ export class Out extends Function {
 
 				const targetProp = prop as keyof Out
 				if (targetProp in target && isFunction(target[targetProp])) {
-					return target[targetProp].bind(target)
+					return (target[targetProp] as AnyFunction).bind(target)
 				}
 
 				return Reflect.get(target, prop, receiver)
@@ -263,25 +272,19 @@ export class Out extends Function {
 	}
 
 	/**
-	 * Set the persistent name of the Out app.
-	 * @param {string} name
+	 * Set the persistent name of the `Out` app.
 	 */
 	setName(name: string): Out {
 		this.persistent.name = name
 		return this.#proxy
 	}
 
-	clone()
-
-	clone(options: Partial<OutSettings>)
-
-	clone(name: string)
-
-	clone(name: string, options: Partial<OutSettings>)
-
-	clone(name?: Partial<OutSettings> | string, options?: Partial<OutSettings>)
-
-	clone(name?: Partial<OutSettings> | string, options?: Partial<OutSettings>) {
+	clone(): Out
+	clone(options: Partial<OutSettings>): Out
+	clone(name: string): Out
+	clone(name: string, options: Partial<OutSettings>): Out
+	clone(name?: Partial<OutSettings> | string, options?: Partial<OutSettings>): Out
+	clone(name?: Partial<OutSettings> | string, options?: Partial<OutSettings>): Out {
 		if (isString(name)) {
 			options = options as Partial<OutSettings>
 		} else if (name) {
@@ -305,7 +308,8 @@ export class Out extends Function {
 	}
 
 	rule(symbol?: string, min?: number, max?: number): Out {
-		return this.write(horizontalLine(symbol || '-', min ?? 20, max))
+		_console.log(horizontalLine(symbol || '-', min ?? 20, max))
+		return this.#proxy
 	}
 
 	/**
@@ -634,7 +638,7 @@ export class Out extends Function {
 
 	/**
 	 * reset the state
-	 * @private1
+	 * @private
 	 * @internal
 	 */
 	#reset(...exclusions: string[]) {
@@ -652,9 +656,9 @@ export class Out extends Function {
 	 */
 	private getColorize() {
 		return {
-			text: text => settings.textColor && this.state.color ? wrapColor(this.state.color, text) : text,
-			color: text => this.state.color ? wrapColor(this.state.color, text) : text,
-			prefix: text => this.persistent.prefix?.color ? wrapColor(this.persistent.prefix.color, text) : text
+			text: (text: string): string => settings.textColor && this.state.color ? wrapColor(this.state.color, text) : text,
+			color: (text: string): string => this.state.color ? wrapColor(this.state.color, text) : text,
+			prefix: (text: string): string => this.persistent.prefix?.color ? wrapColor(this.persistent.prefix.color, text) : text
 		}
 	}
 
